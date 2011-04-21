@@ -1,0 +1,2 @@
+Version: 0.2.4-Beta1.07-indev
+LOCK=1
