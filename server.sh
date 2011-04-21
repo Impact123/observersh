@@ -139,14 +139,14 @@ fi
 
 # SCREENLOGCHECK
 if [ -f "$DIR/$SRCDSDIR/screenlog.0" ]; then 
-  cd $DIR/$SRCDSDIR; mv  screenlog.0 $LOGDIR
+  cd $DIR/$SRCDSDIR; mv screenlog.0 $LOGDIR
   cd $DIR/$SRCDSDIR/$LOGDIR
   mv screenlog.0 "screenlog.0_`$DATE`"
 fi
 
 # LOGTIMECHECK
-if [ -f "$DIR/$SRCDSDIR/$LOGDIR/screenlog.0*" ]; then 
-  find $DIR/$SRCDSDIR/$LOGDIR -name "screenlog.0*" -type f -mtime +$LOGTIME $LOGEXEC
+if [[ `find $DIR/$SRCDSDIR/$LOGDIR/ -type f -name 'screenlog.0_*'` ]]; then 
+  find $DIR/$SRCDSDIR/$LOGDIR/ -type f -name 'screenlog.0*' -mtime $LOGTIME $LOGEXEC
 fi
 
 # PORTCHECK
@@ -458,7 +458,7 @@ if [[ `screen -ls |grep $SCREENNAME-backup` ]]; then
 fi
 
 # BACKUPS NACH TMP SCHIEBEN FALLS VORHANDEN --- FIXME ---
-if [[ `find $DIR -name "$SCREENNAME*.tar.gz"` ]]; then
+if [[ `find $DIR/ -name '$SCREENNAME*.tar.gz'` ]]; then
   mv -f $SCREENNAME*.tar.gz $DIR/tmp
 fi
 
@@ -898,7 +898,7 @@ fi
 echo "Loesche alte ztmp Dateien..."
 # COUNT FILES
 find $DIR/$SRCDSDIR/$GAMEMOD/ -name '*.ztmp' -mtime $LOGTIME | wc -l > $DIR/tmp/cleanup_ztmp_count.tmp
-find $DIR/$SRCDSDIR/$GAMEMOD/ -name '*.ztmp' -mtime $LOGTIME |xargs rm -f 
+find $DIR/$SRCDSDIR/$GAMEMOD/ -name '*.ztmp' -mtime $LOGTIME $LOGEXEC
 # AMOUNT OF REMOVED FILES
 if [ -f "$DIR/tmp/cleanup_ztmp_count.tmp" ]; then
   CLEANUP_ZTMP_COUNT="`cat $DIR/tmp/cleanup_ztmp_count.tmp`"
@@ -913,7 +913,7 @@ sleep 2
 echo "Loesche alte log Dateien..."
 # COUNT FILES
 find $DIR/$SRCDSDIR/$GAMEMOD/logs/ -type f -name '*.log' -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_log_count.tmp
-find $DIR/$SRCDSDIR/$GAMEMOD/logs/ -type f -name '*.log' -mtime +$LOGTIME |xargs rm -f
+find $DIR/$SRCDSDIR/$GAMEMOD/logs/ -type f -name '*.log' -mtime +$LOGTIME $LOGEXEC
 # AMOUNT OF REMOVED FILES
 if [ -f "$DIR/tmp/cleanup_log_count.tmp" ]; then
   CLEANUP_LOG_COUNT="`cat $DIR/tmp/cleanup_log_count.tmp`"
@@ -934,8 +934,8 @@ echo $(( `cat $DIR/tmp/cleanup_downloads_count.tmp` + `cat $DIR/tmp/cleanup_down
 rm -f $DIR/tmp/cleanup_downloads2_count.tmp
 
 # REMOVE FILES
-find $DIR/$SRCDSDIR/$GAMEMOD/downloads/ -type f -mtime +$LOGTIME |xargs rm -f
-find $DIR/$SRCDSDIR/$GAMEMOD/DownloadLists/ -type f -mtime +$LOGTIME |xargs rm -f
+find $DIR/$SRCDSDIR/$GAMEMOD/downloads/ -type f -mtime +$LOGTIME $LOGEXEC
+find $DIR/$SRCDSDIR/$GAMEMOD/DownloadLists/ -type f -mtime +$LOGTIME $LOGEXEC
 
 # AMOUNT OF REMOVED FILES
 if [ -f "$DIR/tmp/cleanup_downloads_count.tmp" ]; then
