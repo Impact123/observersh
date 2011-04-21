@@ -104,14 +104,13 @@ Server.sh CHANGELOG
 - Fehler in Hilfsausgabe gefixt
 
 
-
 # Version: 0.2.4-Beta1.07
 - Statuscheck leicht bearbeitet, falls Kein SCREENNAME- gefunden wird
 - Backupausgabe je nachdem ob der Server online war, und gestoppt werden musste
 - Backups werden nun nach DIR/tmp verschoben
 - Backupparameter in server.sh von BACKUPPARAM nun zu BACKUP_FILES geaendert
-- CRON: Funktionsabfrage falls der Cron bereits existiert, ob man überschreiben möchte.
-- README: Hinweise zur Konfiguration der Config zugefügt
+- CRON: Funktionsabfrage falls der Cron bereits existiert, ob man Ã¼berschreiben mÃ¶chte.
+- README: Hinweise zur Konfiguration der Config zugefÃ¼gt
 - Zustimmung bei listgames und installieren des hldsupdatetools nicht mehr notwendig
-
+- Updateausgabe je nachdem ob der Server online war, und gestoppt werden musste
 
