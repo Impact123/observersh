@@ -4,12 +4,12 @@
 # Ueber Das Script
 # ---------------------------------------------------------------------------------------------
 # Name:    - Gameserververwaltungsscript fuer Orangebox-Games 
-# Version: - 0.2.4-Beta1.07-indev
+# Version: - 0.2.4-Beta2
 # Author:  - Impact, http://gugy.eu
 # Lizens:  - GPLv3
 # E-Mail:  - support@gugy.eu
 # Web:     - http://gugyclan.eu
-# Datum:   - 18.04.2011
+# Datum:   - 22.04.2011
 #
 #
 #
@@ -32,7 +32,7 @@
 #
 # ---------------------------------------------------------------------------------------------
 
-VERSION="Version: 0.2.4-Beta1.07-indev"
+VERSION="Version: 0.2.4-Beta2"
 
 # FARBEN
 GELB="\033[1;33m"
@@ -40,8 +40,12 @@ ROT="\033[0;31m"
 FARBLOS="\033[0m"
 # ---
 
+# STARTUP_LOCK auf 0 SETZEN
+STARTUP_LOCK="0"
+
 # SCRIPTAUFRUF VON UEBERALL
 cd $(dirname $0)
+
 
  clear
 # CONFIGCHECK
@@ -50,20 +54,23 @@ if [ -f "server.conf" ]; then
   source server.conf
 else
   echo -e $ROT"Error:$FARBLOS Configdatei fehlt oder Pfad ist falsch."
-  exit
+  # STARTUP_LOCK SETZEN
+  STARTUP_LOCK="$[$STARTUP_LOCK+1]"
 fi
 
 # ADMINCHECK
 if [ "`whoami`" == "root" ]; then
   echo "Verantwortungsvolle Admins starten Gameserver nicht mit dem root User."
-  exit
+  # STARTUP_LOCK SETZEN
+  STARTUP_LOCK="$[$STARTUP_LOCK+1]"
 fi
 
  # QSTATCHECK
 if [[ ! `which $QUAKESTAT` ]]; then
   echo -e $ROT"Error:$FARBLOS Paket $QUAKESTAT nicht gefunden,"
   echo "sie sollten es installieren oder die Variable in der Kopfzeile anpassen."
-  exit
+  # STARTUP_LOCK SETZEN
+  STARTUP_LOCK="$[$STARTUP_LOCK+1]"
 fi
 
 # DIRCHECK
@@ -71,11 +78,26 @@ if [ "$DIR" == "" ]; then
   echo -e $ROT"Error:$FARBLOS Es wurde kein Dir angegeben."
   echo    "    [- Es wurde folgendes Verzeichnis ausgelesen"
   echo -e $GELB"    [- $(pwd)"$FARBLOS
+  # STARTUP_LOCK SETZEN
+  STARTUP_LOCK="$[$STARTUP_LOCK+1]"
+fi
+
+# DIRCHECK2
+if [ ! -d "$DIR" ]; then
+  echo -e $ROT"Error:$FARBLOS Das Verzeichnis '$DIR' scheint nicht zu existieren"
+  echo    "    [- Es wurde folgendes Verzeichnis ausgelesen"
+  echo -e $GELB"    [- $(pwd)"$FARBLOS
+  # STARTUP_LOCK SETZEN
+  STARTUP_LOCK="$[$STARTUP_LOCK+1]"
+  # DIR DOESNT EXIST SETZEN
+  DIR_DOESNT_EXIST="1"
 fi
 
 # SCRENNNAMECHECK
 if [ "$SCREENNAME" == "" ]; then
   echo -e $ROT"Error:$FARBLOS Es wurde kein Screenname angegeben."
+  # STARTUP_LOCK SETZEN
+  STARTUP_LOCK="$[$STARTUP_LOCK+1]"
 fi
 
 # IPCHECK
@@ -86,21 +108,40 @@ if [ "$IP" == "" ]; then
   echo -e $ROT"Error:$FARBLOS Es wurde keine IP angegeben."
   echo -e "    [- Es wurde folgende ipv4-Adresse ausgelesen"
   echo -e $GELB"    [- $INET_ADRESS"$FARBLOS
+  # STARTUP_LOCK SETZEN
+  STARTUP_LOCK="$[$STARTUP_LOCK+1]"
 fi
 
 if [ "$PORT" == "" ]; then
   echo -e $ROT"Error:$FARBLOS Es wurde kein Port angegeben."
-  exit
+  # STARTUP_LOCK SETZEN
+  STARTUP_LOCK="$[$STARTUP_LOCK+1]"
 fi
 
-# EXTENSIONDIRCHECK
-if [ ! -d "$DIR/extensions" ]; then 
-  mkdir $DIR/extensions
+# DIRWRAPPER
+if [ ! "$DIR_DOESNT_EXIST" == "1" ];then
+
+    # EXTENSIONDIRCHECK
+    if [ ! -d "$DIR/extensions" ]; then 
+      mkdir $DIR/extensions
+    fi
+
+    # TMPDIRCHECK
+    if [ ! -d "$DIR/tmp" ]; then 
+      mkdir $DIR/tmp
+    fi
+	
+	# TEMPLATEDIRCHECK # --- Next Version ---
+#    if [ ! -d "$DIR/templates" ]; then 
+#      mkdir $DIR/templates
+#    fi
 fi
 
-# TMPDIRCHECK
-if [ ! -d "$DIR/tmp" ]; then 
-  mkdir $DIR/tmp
+ # STARTUP_LOCK CHECKEN
+ if [ ! "$STARTUP_LOCK" == "0" ]; then
+   echo ""
+   echo -e $GELB"Es wurden mindestens '$STARTUP_LOCK' Probleme gefunden, Start verhindert."$FARBLOS
+   exit
 fi
 
  
