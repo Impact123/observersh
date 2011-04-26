@@ -87,8 +87,10 @@ if [ ! -d "$DIR" ]; then
   echo -e $ROT"Error:$FARBLOS Das Verzeichnis '$DIR' scheint nicht zu existieren"
   echo    "    [- Es wurde folgendes Verzeichnis ausgelesen"
   echo -e $GELB"    [- $(pwd)"$FARBLOS
+  
   # STARTUP_LOCK SETZEN
   STARTUP_LOCK="$[$STARTUP_LOCK+1]"
+  
   # DIR DOESNT EXIST SETZEN
   DIR_DOESNT_EXIST="1"
 fi
@@ -781,6 +783,7 @@ fi
   clear; echo -e $GELB"Update war erfolgreich"$FARBLOS
 else 
   clear; echo -e $GELB"Update abgebrochen"$FARBLOS
+  
 fi
 ;;
 # ---------------------------------------------------------------------------------------------

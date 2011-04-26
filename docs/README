@@ -163,7 +163,7 @@ ____________________________
 1)  start                     - Startet den Gameserver.
 2)  stop                      - Stoppt den Gameserver.
 3)  restart                   - Restartet den Gameserver.
-4)  update|install            - Updatet/Installiert den Gameserver. | Gleich wie Update.
+4)  update|install            - Updatet/Installiert den Gameserver.
 5)  status                    - Zeigt den Status des Gameservers.
 6)  watch                     - Oeffnet die Screensession des Gameservers.
 7)  watchupdate               - Oeffnet die Screensession des Updaters.
@@ -180,8 +180,8 @@ ____________________________
 16) addonremove               - Loescht ein Addon das Vom Masterserver bezogen werden kann.
 17) addonlist                 - Listet alle Addons auf die ueber den Installer bezogen werden koennen
 18) addons|addonlist_local    - Listet alle Addons auf die ueber den Installer installiert wurden
-19) cleanup                   - Feature to come...
-20) cronjob                   - Erstellt einen Taeglichen Cronjob [BETA].
+19) cleanup                   - Raeumt den Server auf und entfernt alte Dateien.
+20) cronjob                   - Erstellt einen Taeglichen Cronjob.
 21) help|h                    - Zeigt diese Hilfe an
 --------------------------------------
 

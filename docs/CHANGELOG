@@ -115,7 +115,7 @@ Server.sh CHANGELOG
 - Updateausgabe je nachdem ob der Server online war, und gestoppt werden musste.
 - Bei Startfehlern wird nun eine Variable gesetzt und das Starten verhindert.
 - Bei Startfehler erscheint nun die Anzahl der Fehler.
-- Wrapper fue Verzeichnisabfragen
+- Wrapper fuer Verzeichnisabfragen
 - Cleanup Funktion eingebaut.
 
 
