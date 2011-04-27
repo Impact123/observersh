@@ -939,10 +939,12 @@ fi
   
 
 # ZTMP
+# ---------------
 echo "Loesche alte ztmp Dateien..."
 # COUNT FILES
 find $DIR/$SRCDSDIR/$GAMEMOD/ -name '*.ztmp' -mtime $LOGTIME | wc -l > $DIR/tmp/cleanup_ztmp_count.tmp
 find $DIR/$SRCDSDIR/$GAMEMOD/ -name '*.ztmp' -mtime $LOGTIME $LOGEXEC
+
 # AMOUNT OF REMOVED FILES
 if [ -f "$DIR/tmp/cleanup_ztmp_count.tmp" ]; then
   CLEANUP_ZTMP_COUNT="`cat $DIR/tmp/cleanup_ztmp_count.tmp`"
@@ -951,13 +953,16 @@ else
   ZTMP_COUNT="Error beim lesen der Datei."
 fi
 sleep 2
+# ---------------
 
 
 # LOGS
+# ---------------
 echo "Loesche alte log Dateien..."
 # COUNT FILES
 find $DIR/$SRCDSDIR/$GAMEMOD/logs/ -type f -name '*.log' -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_log_count.tmp
 find $DIR/$SRCDSDIR/$GAMEMOD/logs/ -type f -name '*.log' -mtime +$LOGTIME $LOGEXEC
+
 # AMOUNT OF REMOVED FILES
 if [ -f "$DIR/tmp/cleanup_log_count.tmp" ]; then
   CLEANUP_LOG_COUNT="`cat $DIR/tmp/cleanup_log_count.tmp`"
@@ -966,9 +971,11 @@ else
   CLEANUP_LOG_COUNT="Error beim lesen der Datei."
 fi
 sleep 2
+# ---------------
 
 
 # DOWNLOADS
+# ---------------
 echo "Loesche alte Download Dateien..."
 # COUNT FILES
 find $DIR/$SRCDSDIR/$GAMEMOD/downloads/ -type f -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_downloads_count.tmp
@@ -989,10 +996,28 @@ else
   CLEANUP_DOWNLOADS_COUNT="Error beim lesen der Datei."
 fi
 sleep 2
+# ---------------
 
+
+# SOURCETV
+# ---------------
+echo "Loesche alte Demo/SourceTv Dateien..."
+# COUNT FILES
+find $DIR/$SRCDSDIR/$GAMEMOD/ -type f -name '*.dem' -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_demo_count.tmp
+find $DIR/$SRCDSDIR/$GAMEMOD/logs/ -type f -name '*.dem' -mtime +$LOGTIME $LOGEXEC
+
+# AMOUNT OF REMOVED FILES
+if [ -f "$DIR/tmp/cleanup_demo_count.tmp" ]; then
+  CLEANUP_DEMO_COUNT="`cat $DIR/tmp/cleanup_demo_count.tmp`"
+  rm -f $DIR/tmp/cleanup_demo_count.tmp
+else
+  CLEANUP_DEMO_COUNT="Error beim lesen der Datei."
+fi
+sleep 2
+# ---------------
 
 clear; echo -e $GELB"Server wurde aufgeraeumt."$FARBLOS
-echo "Es wurden: '$CLEANUP_ZTMP_COUNT' Ztmp Dateien '$CLEANUP_LOG_COUNT' Log Dateien und '$CLEANUP_DOWNLOADS_COUNT' Download/s entfernt."
+echo "Es wurden: '$CLEANUP_ZTMP_COUNT' Ztmp Dateien, '$CLEANUP_LOG_COUNT' Log Dateien, '$CLEANUP_DEMO_COUNT' Demo/SourceTv Dateien, und '$CLEANUP_DOWNLOADS_COUNT' Download/s entfernt."
 ;;
 # ---------------------------------------------------------------------------------------------
 
