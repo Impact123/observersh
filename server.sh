@@ -40,7 +40,7 @@ ROT="\033[0;31m"
 FARBLOS="\033[0m"
 # ---
 
-# STARTUP_LOCK auf 0 SETZEN
+# STARTUP_LOCK AUF 0 SETZEN
 STARTUP_LOCK="0"
 
 # SCRIPTAUFRUF VON UEBERALL
@@ -137,6 +137,7 @@ if [ ! "$DIR_DOESNT_EXIST" == "1" ];then
 #    if [ ! -d "$DIR/templates" ]; then 
 #      mkdir $DIR/templates
 #    fi
+
 fi
 
  # STARTUP_LOCK CHECKEN
@@ -174,22 +175,23 @@ if [[ `screen -ls |grep $SCREENNAME-backup` ]]; then
   exit
 fi
 
-# DOPPELBACKUP VERHINDERN
+# DOPPELSTART VERHINDERN
 if [[ `screen -ls |grep $SCREENNAME-running` ]]; then
   echo -e $ROT"Error:$FARBLOS Server $SCREENNAME-running laeuft noch, Server kann nicht gestartet werden."
   exit
 fi
 
 # SCREENLOGCHECK
-if [ -f "$DIR/$SRCDSDIR/screenlog.0" ]; then 
-  cd $DIR/$SRCDSDIR; mv screenlog.0 $LOGDIR
+if [[ `find $DIR/$SRCDSDIR/$LOGDIR/ -type f -name "screenlog.0_*"` ]]; then 
+  cd $DIR/$SRCDSDIR
+  mv screenlog.0 $LOGDIR
   cd $DIR/$SRCDSDIR/$LOGDIR
   mv screenlog.0 "screenlog.0_`$DATE`"
 fi
 
 # LOGTIMECHECK
-if [[ `find $DIR/$SRCDSDIR/$LOGDIR/ -type f -name 'screenlog.0_*'` ]]; then 
-  find $DIR/$SRCDSDIR/$LOGDIR/ -type f -name 'screenlog.0*' -mtime $LOGTIME $LOGEXEC
+if [[ `find $DIR/$SRCDSDIR/$LOGDIR/ -type f -name "screenlog.0_*"` ]]; then 
+  find $DIR/$SRCDSDIR/$LOGDIR/ -type f -name "screenlog.0*" -mtime $LOGTIME $LOGEXEC
 fi
 
 # PORTCHECK
@@ -225,7 +227,7 @@ fi
 # STOP
 # ---------------------------------------------------------------------------------------------
 stop|2)
-clear
+# CHECK OB SERVER LAEUFT
 if [[ `screen -ls |grep $SCREENNAME-running` ]]; then
   screen -dr $SCREENNAME-running -X quit 
   echo -e $GELB"Server $SCREENNAME wurde gestoppt."$FARBLOS
@@ -267,7 +269,8 @@ $0 start
 update|install|4)
 # PRECONFIGURE_IN
 $0 preconfigure >/dev/null
-# ----
+
+# FALLS SERVER NOCH LAEUFT
 if [[ `screen -ls |grep $SCREENNAME-running` ]]; then
   UPDATE_SERVER_STAT="ON"
   echo "Server $SCREENNAME laeuft noch, und wird gestoppt."
@@ -301,9 +304,7 @@ if [ ! -f "steam" ]; then
   clear
 fi
 
-# STOP
-$0 stop
-# ---
+
 screen -dmS $SCREENNAME-update ./steam -command update -game "$UPDATEMOD" -dir . -verify_all -retry 
 if [ "$UPDATE_SERVER_STAT" == "ON" ]; then
   clear; echo -e $GELB"Der Server $SCREENNAME wurde gestoppt, und das Update wurde im Screen $SCREENNAME-update gestartet."$FARBLOS
@@ -387,7 +388,6 @@ fi
 # WATCHUPDATE
 # ---------------------------------------------------------------------------------------------
 watchupdate|7)
-clear
 if [[ `screen -ls |grep $SCREENNAME-update` ]]; then
   echo "Sitzung wird geoeffnet (STRG+A+D zum Detachen." 
   echo .
@@ -442,8 +442,8 @@ echo "// Maplist.txt created by GuGy.eu Server.sh $VERSION" > $DIR/$SRCDSDIR/$GA
 echo "// Mapcycle.txt created by GuGy.eu Server.sh $VERSION" > $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
 echo "" >> $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
 echo "" >> $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
-ls maps/ | grep '\.bsp$' | sed 's/\.bsp$//' | sort >> $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
-ls maps/ | grep '\.bsp$' | sed 's/\.bsp$//' | sort >> $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
+ls $DIR/$SRCDSDIR/$GAMEMOD/maps/ | grep '\.bsp$' | sed 's/\.bsp$//' | sort >> $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
+ls $DIR/$SRCDSDIR/$GAMEMOD/maps/ | grep '\.bsp$' | sed 's/\.bsp$//' | sort >> $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
 
 clear; echo -e $GELB"Mapliste und Mapcycle wurden erstellt, und die alten nach Datum gebackuppt."$FARBLOS
 ;;
@@ -454,8 +454,7 @@ clear; echo -e $GELB"Mapliste und Mapcycle wurden erstellt, und die alten nach D
 # LISTGAMES
 # ---------------------------------------------------------------------------------------------
 listgames|10)
-clear
-# CHECKEN OB HLDSUPDATETOOL VORHANDEN
+# CHECKEN OB STEAM VORHANDEN
 if [ ! -f "steam" ]; then
   echo "Das Hldsupdatetool bzw Steam ist nicht vorhanden, und wird nun herruntergeladen."
   sleep 2
@@ -481,6 +480,7 @@ cat games_available.txt
 # BACKUP
 # ---------------------------------------------------------------------------------------------
 backup|11)
+# FALLS SERVER NOCH LAEUFT
 if [[ `screen -ls |grep $SCREENNAME-running` ]]; then
   BACKUP_SERVER_STAT="ON"
   echo "Server $SCREENNAME laeuft noch und wird gestoppt."
@@ -488,20 +488,20 @@ if [[ `screen -ls |grep $SCREENNAME-running` ]]; then
   screen -dr $SCREENNAME-running -X quit
 fi
 
-# Backup waehrend Update verhindern.
+# BACKUP WAEHREND UPDATE VERHINDERN
 if [[ `screen -ls |grep $SCREENNAME-update` ]]; then
   echo -e $ROT"Error:$FARBLOS Update $SCREENNAME-update laeuft noch, Backup kann nicht gestartet werden."
  exit
 fi
 
-# Backup waehrend Backup verhindern.
+# DOPPELBACKUP VERHINDERN
 if [[ `screen -ls |grep $SCREENNAME-backup` ]]; then
  echo -e $ROT"Error:$FARBLOS Backup $SCREENNAME-backup laeuft noch und Backup kann nicht gestartet werden."
  exit
 fi
 
 # BACKUPS NACH TMP SCHIEBEN FALLS VORHANDEN --- FIXME ---
-if [[ `find $DIR/ -name '$SCREENNAME*.tar.gz'` ]]; then
+if [[ `find $DIR/ -name "$SCREENNAME*.tar.gz"` ]]; then
   mv -f $SCREENNAME*.tar.gz $DIR/tmp
 fi
 
@@ -519,34 +519,34 @@ fi
 # PRECONFIGURE
 # ---------------------------------------------------------------------------------------------
 preconfigure|12)
-# Ordnercheck
+# ORDNERCHECK
 if [ ! -d "$DIR/$SRCDSDIR/$GAMEMOD/cfg" ]; then
   echo "$DIR/$SRCDSDIR/$GAMEMOD/cfg existiert nicht."
   exit
 fi
 
-# Filecheck
-# Preconf und Anlegung
+# FILECHECK
+# PRECONF UND ANLEGUNG
 if [ "$PRECONFDEL" == "1" ]; then
   cd $DIR/$SRCDSDIR/$GAMEMOD/cfg
   mv $CFG1 "$CFG1-`$DATE`"
   mv $CFG2 "$CFG2-`$DATE`" 
 fi
 
-# Server.cfg
+# SERVER.CFG
 if [ -f "$DIR/$SRCDSDIR/$GAMEMOD/cfg/server.cfg" ]; then
   echo "Server.cfg schon vorhanden."
   exit
 fi
 
 # ----------
-# Autoexec.cfg
+# AUTOEXEC.CFG
 if [ -f "$DIR/$SRCDSDIR/$GAMEMOD/cfg/autoexec.cfg" ]; then
   echo -e $GELB"autoexec.cfg schon vorhanden."$FARBLOS
   exit
 fi
 
-# Preconf und Anlegung
+# PRECONF UND ANLEGUNG
 if [ "$PRECONFIGURE" == "1" ]; then
   cd $DIR/$SRCDSDIR/$GAMEMOD/cfg
   touch $CFG1 $CFG2
@@ -562,7 +562,7 @@ echo "" >> $CFG1
 echo "" >> $CFG2
 echo "" >> $CFG2
 
-# Config - Autoexec.cfg
+# CONFIG - AUTOEXEC.CFG
 echo "// Auszufuehrende Configs." >> $CFG1
 echo "" >> $CFG1
 echo "// Plugin Settings." >> $CFG1
@@ -602,7 +602,7 @@ echo 'tv_password "MeinPasswort"' >> $CFG1
 echo "" >> $CFG1
 
 
-# Config - Server.cfg
+# CONFIG - SERVER.CFG
 echo "// --- GENERELL ---" >> $CFG2
 echo "" >> $CFG2
 
@@ -626,7 +626,7 @@ echo "" >> $CFG2
 echo "// Loggt ale Aktionen auf dem Server in einem Logfile. (on=an off=aus) " >> $CFG2
 echo 'log "on"' >> $CFG2
 
-# Platzhalter
+# PLATZHALTER
 
 echo "" >> $CFG2
 echo "// Password fuer den RCON Zugriff." >> $CFG2
@@ -707,7 +707,7 @@ echo "writeid" >> $CFG2
 
 
 clear
-echo "$CFG1 und $CFG2 wurden in $SRCDSDIR/$GAMEMOD/cfg angelegt."
+echo -e $GELB"$CFG1 und $CFG2 wurden in $DIR/$SRCDSDIR/$GAMEMOD/cfg angelegt."$FARBLOS
 
 ;;
 # ---------------------------------------------------------------------------------------------
@@ -770,8 +770,8 @@ if [ "$updatequestion" == "yes" ]; then
 cp $0  $0_`$DATE`
 mv $0_* $DIR/tmp
   
-if [ -f "server.conf" ]; then
- # Configmove if exist
+if [ -f "$DIR/server.conf" ]; then
+ # CONFIGMOVE IF EXIST
  # FIXME
   tar xvf server.tar.gz --exclude server.conf --exclude make
   rm server.tar.gz
@@ -821,8 +821,7 @@ if [ -f "$DIR/$2.list" ]; then
     if [ ! "$addonquestion" == "yes" ]; then
       clear; echo -e $GELB"Das Addon $2  Wurde nicht installiert"$FARBLOS
       exit
-   fi
-
+    fi
    
 fi
 
@@ -942,8 +941,8 @@ fi
 # ---------------
 echo "Loesche alte ztmp Dateien..."
 # COUNT FILES
-find $DIR/$SRCDSDIR/$GAMEMOD/ -name '*.ztmp' -mtime $LOGTIME | wc -l > $DIR/tmp/cleanup_ztmp_count.tmp
-find $DIR/$SRCDSDIR/$GAMEMOD/ -name '*.ztmp' -mtime $LOGTIME $LOGEXEC
+find $DIR/$SRCDSDIR/$GAMEMOD/ -name "*.ztmp" -mtime $LOGTIME | wc -l > $DIR/tmp/cleanup_ztmp_count.tmp
+find $DIR/$SRCDSDIR/$GAMEMOD/ -name "*.ztmp" -mtime $LOGTIME $LOGEXEC
 
 # AMOUNT OF REMOVED FILES
 if [ -f "$DIR/tmp/cleanup_ztmp_count.tmp" ]; then
@@ -960,8 +959,8 @@ sleep 2
 # ---------------
 echo "Loesche alte log Dateien..."
 # COUNT FILES
-find $DIR/$SRCDSDIR/$GAMEMOD/logs/ -type f -name '*.log' -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_log_count.tmp
-find $DIR/$SRCDSDIR/$GAMEMOD/logs/ -type f -name '*.log' -mtime +$LOGTIME $LOGEXEC
+find $DIR/$SRCDSDIR/$GAMEMOD/logs/ -type f -name "*.log" -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_log_count.tmp
+find $DIR/$SRCDSDIR/$GAMEMOD/logs/ -type f -name "*.log" -mtime +$LOGTIME $LOGEXEC
 
 # AMOUNT OF REMOVED FILES
 if [ -f "$DIR/tmp/cleanup_log_count.tmp" ]; then
@@ -1003,8 +1002,8 @@ sleep 2
 # ---------------
 echo "Loesche alte Demo/SourceTv Dateien..."
 # COUNT FILES
-find $DIR/$SRCDSDIR/$GAMEMOD/ -type f -name '*.dem' -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_demo_count.tmp
-find $DIR/$SRCDSDIR/$GAMEMOD/logs/ -type f -name '*.dem' -mtime +$LOGTIME $LOGEXEC
+find $DIR/$SRCDSDIR/$GAMEMOD/ -type f -name "*.dem" -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_demo_count.tmp
+find $DIR/$SRCDSDIR/$GAMEMOD/logs/ -type f -name "*.dem" -mtime +$LOGTIME $LOGEXEC
 
 # AMOUNT OF REMOVED FILES
 if [ -f "$DIR/tmp/cleanup_demo_count.tmp" ]; then
@@ -1082,6 +1081,21 @@ $CRONJOB_MINUTE $CRONJOB_HOUR * * * $DIR/tmp/cron-$SCREENNAME-$CRONJOB_ACTION"
 
 
 
+# WATCHLOG
+# ---------------------------------------------------------------------------------------------
+watchlog)
+if [ -f "$DIR/$SRCDSDIR/screenlog.0" ]; then
+  echo -e $GELB"--- Log beginnt ---"$FARBLOS
+  more $DIR/$SRCDSDIR/screenlog.0
+  echo -e $GELB"--- Log zu Ende ---"$FARBLOS
+else
+  echo "Kein Screenlog vorhanden."
+fi
+;;
+# ---------------------------------------------------------------------------------------------
+
+
+
 # HELP
 # ---------------------------------------------------------------------------------------------
 h|help|-h|--help|21)
@@ -1111,8 +1125,8 @@ echo "15) addoninstall              - Laed ein Addon Vom dem in der Config einge
 echo "16) addonremove               - Loescht ein Addon das Vom Masterserver bezogen werden kann."
 echo "17) addonlist                 - Listet alle Addons auf die ueber den Installer bezogen werden koennen"
 echo "18) addons|addonlist_local    - Listet alle Addons auf die ueber den Installer installiert wurden"
-echo "19) cleanup                   - Feature to come..."
-echo "20) cronjob|crontab|cron      - Erstellt einen Taeglichen Cronjob [BETA]."
+echo "19) cleanup                   - Entfernt alte Logs, SourceTV Demos, Downloads, und Ztmp Datein."
+echo "20) cronjob|crontab|cron      - Erstellt einen Taeglichen Cronjob"
 echo ""
 echo ""
 echo "21) help|h                    - Zeigt diese Hilfe an"
