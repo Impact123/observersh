@@ -555,8 +555,8 @@ else
   exit
 fi
 
-echo "// Minimal Server/Autoexec\.cfg by GuGy.eu Server.sh $VERSION" > $CFG1
-echo "// Minimal Server/Autoexec\.cfg by GuGy.eu Server.sh $VERSION" > $CFG2
+echo "// Minimal Autoexec.cfg by GuGy.eu Server.sh $VERSION" > $CFG1
+echo "// Minimal Server.cfg by GuGy.eu Server.sh $VERSION" > $CFG2
 echo "" >> $CFG1
 echo "" >> $CFG1
 echo "" >> $CFG2
@@ -574,11 +574,9 @@ echo "" >> $CFG1
 echo "" >> $CFG1
 
 
-echo "// Befehle fuer den SourceTv." >> $CFG1
 echo "" >> $CFG1
-echo "// tv_record Name der Demo" >> $CFG1
-echo "// tv_stoprecord" >> $CFG1
-echo "// tv_stop" >> $CFG1
+echo "// Loggt alle Aktionen auf dem Server in einem Logfile. (on=an off=aus) " >> $CFG1
+echo 'log "on"' >> $CFG1
 echo "" >> $CFG1
 echo "// --- SourceTv ---" >> $CFG1
 echo "" >> $CFG1
@@ -622,9 +620,6 @@ echo 'sv_consistency "1"' >> $CFG2
 echo "" >> $CFG2
 echo "// Einstellung der Zuschauerkamera fuer Tote Spieler. (0=Allen zuschauen + Freier Flug / 1=Nur Team zuschauen (Egoperspektive)" >> $CFG2
 echo 'mp_forcecamera "1"' >> $CFG2
-echo "" >> $CFG2
-echo "// Loggt ale Aktionen auf dem Server in einem Logfile. (on=an off=aus) " >> $CFG2
-echo 'log "on"' >> $CFG2
 
 # PLATZHALTER
 
@@ -1081,6 +1076,82 @@ $CRONJOB_MINUTE $CRONJOB_HOUR * * * $DIR/tmp/cron-$SCREENNAME-$CRONJOB_ACTION"
 
 
 
+
+# MAKEVDF
+# ---------------------------------------------------------------------------------------------
+makevdf|vdf|21)
+
+case "$2" in
+# METAMOD
+mm|metamod)
+if [ -d "$DIR/$SRCDSDIR/$GAMEMOD/addons/metamod" ]; then
+  echo "\"Plugin\"
+  {
+  \"file\"	\"../$GAMEMOD/addons/metamod/bin/server\"
+  }
+  " > $DIR/$SRCDSDIR/$GAMEMOD/addons/metamod.vdf
+  echo -e $GELB"metamod.vdf wurde angelegt"$FARBLOS
+else
+      echo "Metamodordner existiert nicht."
+fi
+;;
+# ---------------------------------------------------
+
+
+
+
+# SOURCEMOD
+# ---------------------------------------------------
+sm|sourcemod)
+if [ -d "$DIR/$SRCDSDIR/$GAMEMOD/addons/metamod" ]; then
+   echo '"Metamod Plugin"
+  {
+  "alias"		"sourcemod"
+  "file"		"addons/sourcemod/bin/sourcemod_mm"
+  }
+  ' > $DIR/$SRCDSDIR/$GAMEMOD/addons/metamod/sourcemod.vdf
+  echo -e $GELB"sourcemod.vdf wurde angelegt"$FARBLOS
+else
+  echo "Metamodordner existiert nicht."
+fi
+;;
+# ---------------------------------------------------
+
+
+
+
+# MANI ADMIN
+# ---------------------------------------------------
+mani|mani_admin)
+if [ -d "$DIR/$SRCDSDIR/$GAMEMOD/addons/mani_admin_plugin" ]; then
+  echo "\"Plugin\"
+  {
+  \"file\" \"../$GAMEMOD/addons/mani_admin_plugin_i486\"
+  }
+  " > $DIR/$SRCDSDIR/$GAMEMOD/addons/mani_admin_plugin.vdf
+  echo -e $GELB"mani_admin_plugin.vdf wurde angelegt"$FARBLOS
+else
+  echo "mani_admin_plugin Ordner existiert nicht."
+fi
+;;
+# ---------------------------------------------------
+
+
+
+*)
+echo -e $ROT"Error:$FARBLOS Es wurde kein oder ein falscher Mod angegeben"
+echo -e "       Nutzung: sm|sourcemod - mm|metamod - mani|mani_admin"
+;;  
+
+esac  
+exit
+  
+;;
+# ---------------------------------------------------------------------------------------------
+
+
+
+
 # WATCHLOG
 # ---------------------------------------------------------------------------------------------
 watchlog)
@@ -1096,9 +1167,10 @@ fi
 
 
 
+
 # HELP
 # ---------------------------------------------------------------------------------------------
-h|help|-h|--help|21)
+h|help|-h|--help|22)
 clear
 echo "Ausfuehrbare Befehle"
 echo "Usage: $0 {Code/Befehl}"
@@ -1127,9 +1199,10 @@ echo "17) addonlist                 - Listet alle Addons auf die ueber den Insta
 echo "18) addons|addonlist_local    - Listet alle Addons auf die ueber den Installer installiert wurden"
 echo "19) cleanup                   - Entfernt alte Logs, SourceTV Demos, Downloads, und Ztmp Datein."
 echo "20) cronjob|crontab|cron      - Erstellt einen Taeglichen Cronjob"
+echo "21) makevdf|vdf               - Erstellt .vdf Dateien fuer verschiedene Addons."
 echo ""
 echo ""
-echo "21) help|h                    - Zeigt diese Hilfe an"
+echo "22) help|h                    - Zeigt diese Hilfe an"
 ;;
 # ---------------------------------------------------------------------------------------------
 
