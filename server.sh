@@ -147,6 +147,16 @@ fi
    exit
 fi
 
+# PARAMETERZUSAETZE
+
+# FARBUNTERDRUECKUNG
+if [[ `echo $* |grep "\--nocolors" ` ]]; then
+  GELB=""
+  ROT=""
+  FARBLOS=""
+fi
+
+# ----
  
 # START - BEGINN DES SCRIPTES
 # ---------------------------------------------------------------------------------------------
