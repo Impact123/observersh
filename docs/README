@@ -10,8 +10,8 @@ von jeglichen moeglicherweise auftretenden Problemen distanziere.
 Verwendung auf eigene Gefahr.
 
 
-Vielen Dank dass sie sich dieses Script gedownloadet haben,
-falls es ihnen gefaellt koennen sie mir Kritik und Verbesserungsvorschlaege an support@gugy.eu senden.
+Vielen Dank dass sie sich dieses Script gedownloadet haben.
+Falls es ihnen gefaellt, koennen sie mir Kritik und Verbesserungsvorschlaege an support@gugy.eu senden.
 Konfigurationen nehmen sie bitte in der beiliegenden server.conf Datei vor.
 
 
@@ -94,7 +94,7 @@ Vom Script erstellte Ordner:
 
 Bevor man das Script verwendet:
 
-Das Script greift auf folgende Programme zurueck, daher sollten sie diese installiert haben:
+Das Script greift unter anderem auf folgende Programme zurueck, daher sollten sie diese installiert haben:
 
 - Bzip2
 - Screen
@@ -182,6 +182,7 @@ ____________________________
 18) addons|addonlist_local    - Listet alle Addons auf die ueber den Installer installiert wurden
 19) cleanup                   - Raeumt den Server auf und entfernt alte Dateien.
 20) cronjob                   - Erstellt einen Taeglichen Cronjob.
+21) makevdf|vdf               - Erstellt .vdf Dateien fuer verschiedene Addons.
 21) help|h                    - Zeigt diese Hilfe an
 --------------------------------------
 
