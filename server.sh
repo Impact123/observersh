@@ -348,12 +348,12 @@ if [ ! "`$QUAKESTAT -$QSTAT $IP:$PORT | grep -v ADDRESS | awk '{ print $2 }' | a
   echo "---"
 fi
 
-# Update
+# UPDATE
 if [[ `screen -ls |grep $SCREENNAME-update` ]]; then
   clear; echo -e $GELB"Server $SCREENNAME wird zurzeit geupdatet."$FARBLOS
 fi
 
-# Backup
+# BACKUP
 if [[ `screen -ls |grep $SCREENNAME-backup` ]]; then
   clear; echo -e $GELB"Server $SCREENNAME wird zurzeit gebackuppt."$FARBLOS
 fi
@@ -546,15 +546,18 @@ fi
 # SERVER.CFG
 if [ -f "$DIR/$SRCDSDIR/$GAMEMOD/cfg/server.cfg" ]; then
   echo "Server.cfg schon vorhanden."
-  exit
+  exit # FIXME Hier sollte ein Check rein CFG_EXIST=1
 fi
 
-# ----------
 # AUTOEXEC.CFG
 if [ -f "$DIR/$SRCDSDIR/$GAMEMOD/cfg/autoexec.cfg" ]; then
   echo -e $GELB"autoexec.cfg schon vorhanden."$FARBLOS
-  exit
+  exit # FIXME Hier sollte ein Check rein CFG_EXIST=1
 fi
+
+
+# FIXME Hier sollte eine Pruefung rein if CFG_EXIST=1
+
 
 # PRECONF UND ANLEGUNG
 if [ "$PRECONFIGURE" == "1" ]; then
