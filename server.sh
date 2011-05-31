@@ -49,8 +49,7 @@ cd $(dirname $0)
 
  clear
 # CONFIGCHECK
-if [ -f "server.conf" ]; then
-  chmod 755 server.conf
+if [ -r "server.conf" ]; then
   source server.conf
 else
   echo -e $ROT"Error:$FARBLOS Configdatei fehlt oder Pfad ist falsch."
@@ -147,7 +146,8 @@ fi
    exit
 fi
 
-# PARAMETERZUSAETZE
+
+# --- PARAMETERZUSAETZE --- #
 
 # FARBUNTERDRUECKUNG
 if [[ `echo $* |grep "\--nocolors" ` ]]; then
@@ -207,6 +207,12 @@ fi
 # PORTCHECK
 if [[ `netstat -aunx |grep $PORT` ]]; then
   echo -e $ROT"Error:$FARBLOS Port $PORT ist schon belegt"
+  exit
+fi
+
+# BINARYCHECK
+if [ ! -f "$DIR/$SRCDSDIR/$BINARY" ]; then
+  echo -e $GELB"Binary existiert nicht."$FARBLOS
   exit
 fi
 
@@ -434,28 +440,41 @@ fi
 # MAPLISTCREATE
 # ---------------------------------------------------------------------------------------------
 maplistcreate|9)
+
 # FALLS MAPLIST VORHANDEN
 if [ -f "$DIR/$SRCDSDIR/$GAMEMOD/maplist.txt" ]; then
   cd $DIR/$SRCDSDIR/$GAMEMOD/
   mv maplist.txt "maplist.txt_`$DATE`"
+  MAPLIST_CFG_EXIST="1"
 fi
 
 # FALLS MAPCYCLE VORHANDEN
 if [ -f "$DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt" ]; then
   cd $DIR/$SRCDSDIR/$GAMEMOD
   mv mapcycle.txt "mapcycle.txt_`$DATE`"
+  MAPLIST_CFG_EXIST="1"
 fi
 
-# MAPS SCHREIBEN
-cd $DIR/$SRCDSDIR/$GAMEMOD
-echo "// Maplist.txt created by GuGy.eu Server.sh $VERSION" > $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
-echo "// Mapcycle.txt created by GuGy.eu Server.sh $VERSION" > $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
-echo "" >> $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
-echo "" >> $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
-ls $DIR/$SRCDSDIR/$GAMEMOD/maps/ | grep '\.bsp$' | sed 's/\.bsp$//' | sort >> $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
-ls $DIR/$SRCDSDIR/$GAMEMOD/maps/ | grep '\.bsp$' | sed 's/\.bsp$//' | sort >> $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
+if [ ! -d "$DIR/$SRCDSDIR/$GAMEMOD/maps" ]; then
+  echo "Ordner Maps ist nocht vorhanden."
+  exit
+else
+  cd $DIR/$SRCDSDIR/$GAMEMOD/maps
+  echo "// Maplist.txt created by GuGy.eu Server.sh $VERSION" > $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
+  echo "// Mapcycle.txt created by GuGy.eu Server.sh $VERSION" > $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
+  echo "" >> $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
+  echo "" >> $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
 
-clear; echo -e $GELB"Mapliste und Mapcycle wurden erstellt, und die alten nach Datum gebackuppt."$FARBLOS
+  ls *.bsp |awk -F '.' '{print $1}' |sort |grep -v 'test_*' >> $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
+  ls *.bsp |awk -F '.' '{print $1}' |sort |grep -v 'test_*' >> $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
+
+    if [ "$MAPLIST_CFG_EXIST" == "1" ]; then
+      echo -e $GELB"Mapliste und Mapcycle wurden erstellt, und die alten nach Datum gebackuppt."$FARBLOS
+	else
+	  echo -e $GELB"Mapliste und Mapcycle wurden erstellt."$FARBLOS
+	fi
+	
+fi
 ;;
 # ---------------------------------------------------------------------------------------------
 
@@ -529,194 +548,74 @@ fi
 # PRECONFIGURE
 # ---------------------------------------------------------------------------------------------
 preconfigure|12)
+
 # ORDNERCHECK
 if [ ! -d "$DIR/$SRCDSDIR/$GAMEMOD/cfg" ]; then
   echo "$DIR/$SRCDSDIR/$GAMEMOD/cfg existiert nicht."
   exit
 fi
 
-# FILECHECK
-# PRECONF UND ANLEGUNG
+
+# PRECONFDEL UND BACKUP
 if [ "$PRECONFDEL" == "1" ]; then
   cd $DIR/$SRCDSDIR/$GAMEMOD/cfg
   mv $CFG1 "$CFG1-`$DATE`"
   mv $CFG2 "$CFG2-`$DATE`" 
 fi
 
-# SERVER.CFG
-if [ -f "$DIR/$SRCDSDIR/$GAMEMOD/cfg/server.cfg" ]; then
-  echo "Server.cfg schon vorhanden."
-  exit # FIXME Hier sollte ein Check rein CFG_EXIST=1
-fi
+# CFG EXIST LOCK AUF 0 SETZEN
+CFG_EXIST_LOCK="0"
 
 # AUTOEXEC.CFG
-if [ -f "$DIR/$SRCDSDIR/$GAMEMOD/cfg/autoexec.cfg" ]; then
+if [ -f "$DIR/$SRCDSDIR/$GAMEMOD/cfg/$CFG1" ]; then
   echo -e $GELB"autoexec.cfg schon vorhanden."$FARBLOS
-  exit # FIXME Hier sollte ein Check rein CFG_EXIST=1
+  CFG_EXIST_LOCK="$[CFG_EXIST_LOCK+1]"
 fi
 
+# SERVER.CFG
+if [ -f "$DIR/$SRCDSDIR/$GAMEMOD/cfg/$CFG2" ]; then
+  echo -e $GELB"Server.cfg schon vorhanden."$FARBLOS
+  CFG_EXIST_LOCK="$[CFG_EXIST_LOCK+1]"
+fi
 
-# FIXME Hier sollte eine Pruefung rein if CFG_EXIST=1
+# CFG EXIST LOCK CHECKEN
+if [ ! "$CFG_EXIST_LOCK" == "0" ]; then
+  exit  
+fi
 
+# TEMPLATE EXIST LOCK AUF 0 SETZEN
+TEMPLATE_EXIST_LOCK="0"
 
-# PRECONF UND ANLEGUNG
+# PRECONF ACTIVE CHECK
 if [ "$PRECONFIGURE" == "1" ]; then
   cd $DIR/$SRCDSDIR/$GAMEMOD/cfg
-  touch $CFG1 $CFG2
 else
   echo -e $ROT"Error:$FARBLOS Variable Preconfigure ist nicht auf 1 gesetzt."
   exit
 fi
 
-echo "// Minimal Autoexec.cfg by GuGy.eu Server.sh $VERSION" > $CFG1
-echo "// Minimal Server.cfg by GuGy.eu Server.sh $VERSION" > $CFG2
-echo "" >> $CFG1
-echo "" >> $CFG1
-echo "" >> $CFG2
-echo "" >> $CFG2
-
 # CONFIG - AUTOEXEC.CFG
-echo "// Auszufuehrende Configs." >> $CFG1
-echo "" >> $CFG1
-echo "// Plugin Settings." >> $CFG1
-echo "" >> $CFG1
-echo "// Bunnyhop/Boost" >> $CFG1
-echo 'sv_enableboost "1"' >> $CFG1
-echo 'sv_enablebunnyhopping "1"' >> $CFG1
-echo "" >> $CFG1
-echo "" >> $CFG1
-
-
-echo "" >> $CFG1
-echo "// Loggt alle Aktionen auf dem Server in einem Logfile. (on=an off=aus) " >> $CFG1
-echo 'log "on"' >> $CFG1
-echo "" >> $CFG1
-echo "// --- SourceTv ---" >> $CFG1
-echo "" >> $CFG1
-echo "// SourceTv An/Aus." >> $CFG1
-echo 'tv_enable "0"' >> $CFG1
-echo "" >> $CFG1
-echo "// Port des TvServers." >> $CFG1
-echo 'tv_port "27020"' >> $CFG1
-echo "" >> $CFG1
-echo "// Staendige Aufnahme zu jeder Zeit." >> $CFG1
-echo 'tv_autorecord "0"' >> $CFG1
-echo "" >> $CFG1
-echo "// Maximale Spieleranzahl die auf den SourceTv verbinden kann." >> $CFG1
-echo 'tv_maxclients "1"' >> $CFG1 >> $CFG1
-echo "" >> $CFG1
-echo "// Name des TvServers." >> $CFG1
-echo 'tv_name "Mein SourceTv"' >> $CFG1
-echo "" >> $CFG1
-echo "// Passwort des SourceTv-Servers." >> $CFG1
-echo 'tv_password "MeinPasswort"' >> $CFG1
-echo "" >> $CFG1
-
+if [[ `wget -q -O- $TEMPLATESURL/$GAMEMOD/$CFG1` ]]; then
+  wget -q $TEMPLATESURL/$GAMEMOD/$CFG1
+else 
+  echo "CFG '$CFG1' konnte nicht heruntergeladen werden, anscheinend ist keine CFG fuer den GameMod '$GAMEMOD' verfuegbar."
+  TEMPLATE_EXIST_LOCK="$[CFG_EXIST_LOCK+1]"
+fi
 
 # CONFIG - SERVER.CFG
-echo "// --- GENERELL ---" >> $CFG2
-echo "" >> $CFG2
+if [[ `wget -q -O- $TEMPLATESURL/$GAMEMOD/$CFG2` ]]; then
+  wget -q $TEMPLATESURL/$GAMEMOD/$CFG2
+else
+  echo "CFG '$CFG1' konnte nicht heruntergeladen werden, anscheinend ist keine CFG fuer den GameMod '$GAMEMOD' verfuegbar."
+  TEMPLATE_EXIST_LOCK="$[CFG_EXIST_LOCK+1]"
+fi
 
-
-
-echo "// Name des Servers." >> $CFG2
-echo 'hostname "MeinServerName"' >> $CFG2
-echo "" >> $CFG2
-echo "// Region des Servers 0=US Ostkueste, 1=US Westkueste, 2= Suedamerika, 3=Europa, 4=Asien, 5=Australien, 6=Mittlerer Osten, 7=Afrika und 255=Welt." >> $CFG2
-echo 'sv_region "3"' >> $CFG2
-echo "" >> $CFG2
-echo "// Password fuer Verbindende Spieler." >> $CFG2
-echo 'sv_password ""' >> $CFG2
-echo "" >> $CFG2
-echo "// 0/1=Verbietet den zugang fuer Spieler mit Custommodels oder anderen Waffenskins, Sounds u.s.w. 0=Erlaubt das Verwenden von" >> $CFG2
-echo 'sv_consistency "1"' >> $CFG2
-echo "" >> $CFG2
-echo "// Einstellung der Zuschauerkamera fuer Tote Spieler. (0=Allen zuschauen + Freier Flug / 1=Nur Team zuschauen (Egoperspektive)" >> $CFG2
-echo 'mp_forcecamera "1"' >> $CFG2
-
-# PLATZHALTER
-
-echo "" >> $CFG2
-echo "// Password fuer den RCON Zugriff." >> $CFG2
-echo 'rcon_password "UltraHighEndSicheresPasswort"' >> $CFG2
-echo "" >> $CFG2
-echo "// Erlauben der Taschenlampe." >> $CFG2
-echo 'mp_flashlight "1"' >> $CFG2
-echo "" >> $CFG2
-echo "// Wie lange die Map laufen soll." >> $CFG2
-echo 'mp_timelimit "15"' >> $CFG2
-echo "" >> $CFG2
-echo "// Teambeschuss." >> $CFG2
-echo 'mp_friendlyfire "1"' >> $CFG2 
-echo "" >> $CFG2
-echo "// Sprachkommunikation auf dem Server erlauben." >> $CFG2
-echo 'sv_voiceenable "1"' >> $CFG2
-echo "" >> $CFG2
-echo "// 1=Voice fuer Alle hoerbar. 0=Voice nur fuer das jeweilige Team hoerbar." >> $CFG2
-echo 'sv_alltalk "1"' >> $CFG2
-echo "" >> $CFG2
-echo "// Downloadurl fuer Custom Content von einem Http Server." >> $CFG2
-echo 'sv_downloadurl ""' >> $CFG2
-echo "" >> $CFG2
-echo "// Limitierung der Framerate." >> $CFG2
-echo 'fps_max "101"' >> $CFG2
-echo "" >> $CFG2
-echo "" >> $CFG2
-
-
-echo "// --- RATES ---" >> $CFG2
-echo "" >> $CFG2 
-echo "// Maximale Bandbreite." >> $CFG2
-echo 'sv_maxrate "30000"' >> $CFG2
-echo "" >> $CFG2 
-echo "// Minimale Bandbreite." >> $CFG2
-echo 'sv_minrate "7500"' >> $CFG2
-echo "" >> $CFG2
-echo "// Maximale Updaterate." >> $CFG2
-echo 'sv_maxupdaterate "67"' >> $CFG2 
-echo "" >> $CFG2
-echo "// Minimale Updaterate." >> $CFG2
-echo 'sv_minupdaterate "34"' >> $CFG2
-echo "" >> $CFG2
-echo "// Maximale Cmdrate." >> $CFG2
-echo 'sv_maxcmdrate "67"' >> $CFG2
-echo "" >> $CFG2
-echo "// Minimale Cmdrate." >> $CFG2
-echo 'sv_mincmdrate "34"' >> $CFG2
-echo "" >> $CFG2
-
-
-echo "// --- SONSTIGES ---" >> $CFG2
-echo "" >> $CFG2
-echo "// Erlaubt das Downloaden." >> $CFG2
-echo 'sv_allowdownload "1"' >> $CFG2
-echo "" >> $CFG2
-echo "// Erlaubt das Uploaden." >> $CFG2
-echo 'sv_allowupload "1"' >> $CFG2
-echo "" >> $CFG2
-echo "// Erstellt Logfiles." >> $CFG2
-echo 'log "1"' >> $CFG2
-echo "" >> $CFG2
-echo "// Beschleunigung in Der Luft." >> $CFG2
-echo 'sv_airaccelerate "150"' >> $CFG2
-echo "" >> $CFG2
-echo "// Beschleunigung im Wasser." >> $CFG2
-echo 'sv_wateraccelerate "150"' >> $CFG2
-echo "" >> $CFG2
-
-
-echo "// Zusaetzliche Configs Ausfuehren." >> $CFG2
-echo "exec autoexec.cfg" >> $CFG2
-echo "exec banned_user.cfg" >> $CFG2
-echo "exec banned_ip.cfg" >> $CFG2
-echo "writeip" >> $CFG2
-echo "writeid" >> $CFG2
-
-
-
-clear
-echo -e $GELB"$CFG1 und $CFG2 wurden in $DIR/$SRCDSDIR/$GAMEMOD/cfg angelegt."$FARBLOS
-
+# TEMPLATE EXIST LOCK CHECKEN
+if [ ! "$TEMPLATE_EXIST_LOCK" == "0" ]; then
+  echo -e $GELB"Es traten Fehler beim downloaden der Configs auf."$FARBLOS
+else
+  echo -e $GELB"$CFG1 und $CFG2 wurden in $DIR/$SRCDSDIR/$GAMEMOD/cfg angelegt."$FARBLOS
+fi
 ;;
 # ---------------------------------------------------------------------------------------------
 

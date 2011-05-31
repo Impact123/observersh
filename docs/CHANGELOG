@@ -124,7 +124,12 @@ Server.sh CHANGELOG
 - MakeVDF Funktion zugefuegt
 - Parameterzusatz --nocolors zugefuegt [Test]
 - Funktion Watchlog zugefuegt
-- 
+- Preconfigurefunktion neu geschrieben.
+  - Variable TEMPLATESURL zugefuegt
+- Maplistcreater neu geschrieben
+  - Test_* Maps werden excludiert
+- Binarycheck zugefuegt
+-
 
 
 

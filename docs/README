@@ -152,6 +152,7 @@ Quakestat     - Auf nicht Debian Systemen unterscheiden sich die Qstat Binarys n
 Backup_files  - Die Dateien des Gameservers welche gebackuppt werden (Siehe Abschnitt 2.).
 Addonurl      - URL von welcher Addons fuer den Installer bezogen werden.
 Cron_logging  - Hiermit wird beeinflusst ob Cronjobs Logfiles erstellen.
+Templatesurl  - URL von welcher Templates bezogen werden.
 
 
 
