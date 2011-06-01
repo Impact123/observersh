@@ -549,12 +549,19 @@ fi
 # ---------------------------------------------------------------------------------------------
 preconfigure|12)
 
+# PRECONF ACTIVE CHECK
+if [ "$PRECONFIGURE" == "1" ]; then
+  cd $DIR/$SRCDSDIR/$GAMEMOD/cfg
+else
+  echo -e $ROT"Error:$FARBLOS Variable Preconfigure ist nicht auf 1 gesetzt."
+  exit
+fi
+
 # ORDNERCHECK
 if [ ! -d "$DIR/$SRCDSDIR/$GAMEMOD/cfg" ]; then
   echo "$DIR/$SRCDSDIR/$GAMEMOD/cfg existiert nicht."
   exit
 fi
-
 
 # PRECONFDEL UND BACKUP
 if [ "$PRECONFDEL" == "1" ]; then
@@ -594,14 +601,6 @@ fi
 
 # TEMPLATE EXIST LOCK AUF 0 SETZEN
 TEMPLATE_EXIST_LOCK="0"
-
-# PRECONF ACTIVE CHECK
-if [ "$PRECONFIGURE" == "1" ]; then
-  cd $DIR/$SRCDSDIR/$GAMEMOD/cfg
-else
-  echo -e $ROT"Error:$FARBLOS Variable Preconfigure ist nicht auf 1 gesetzt."
-  exit
-fi
 
 # CONFIG - AUTOEXEC.CFG
 if [[ `wget -q -O- $TEMPLATESURL/$GAMEMOD/$CFG1` ]]; then
