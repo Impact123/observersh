@@ -559,8 +559,17 @@ fi
 # PRECONFDEL UND BACKUP
 if [ "$PRECONFDEL" == "1" ]; then
   cd $DIR/$SRCDSDIR/$GAMEMOD/cfg
-  mv $CFG1 "$CFG1-`$DATE`"
-  mv $CFG2 "$CFG2-`$DATE`" 
+  
+    if [ -f "$CFG1" ]; then
+      mv $CFG1 "$CFG1-`$DATE`"
+	  echo "CFG '$CFG1' wurde gebackuppt."
+	fi
+	
+	if [ -f "$CFG2" ]; then
+      mv $CFG2 "$CFG2-`$DATE`"
+	  echo "CFG '$CFG2' wurde gebackuppt."
+	fi
+
 fi
 
 # CFG EXIST LOCK AUF 0 SETZEN
@@ -568,7 +577,7 @@ CFG_EXIST_LOCK="0"
 
 # AUTOEXEC.CFG
 if [ -f "$DIR/$SRCDSDIR/$GAMEMOD/cfg/$CFG1" ]; then
-  echo -e $GELB"autoexec.cfg schon vorhanden."$FARBLOS
+  echo -e $GELB"Autoexec.cfg schon vorhanden."$FARBLOS
   CFG_EXIST_LOCK="$[CFG_EXIST_LOCK+1]"
 fi
 
@@ -597,6 +606,7 @@ fi
 # CONFIG - AUTOEXEC.CFG
 if [[ `wget -q -O- $TEMPLATESURL/$GAMEMOD/$CFG1` ]]; then
   wget -q $TEMPLATESURL/$GAMEMOD/$CFG1
+  echo -e $GELB"CFG '$CFG1' wurde heruntergeladen."$FARBLOS
 else 
   echo "CFG '$CFG1' konnte nicht heruntergeladen werden, anscheinend ist keine CFG fuer den GameMod '$GAMEMOD' verfuegbar."
   TEMPLATE_EXIST_LOCK="$[CFG_EXIST_LOCK+1]"
@@ -605,6 +615,7 @@ fi
 # CONFIG - SERVER.CFG
 if [[ `wget -q -O- $TEMPLATESURL/$GAMEMOD/$CFG2` ]]; then
   wget -q $TEMPLATESURL/$GAMEMOD/$CFG2
+  echo -e $GELB"CFG '$CFG2' wurde heruntergeladen."$FARBLOS
 else
   echo "CFG '$CFG1' konnte nicht heruntergeladen werden, anscheinend ist keine CFG fuer den GameMod '$GAMEMOD' verfuegbar."
   TEMPLATE_EXIST_LOCK="$[CFG_EXIST_LOCK+1]"
@@ -614,7 +625,7 @@ fi
 if [ ! "$TEMPLATE_EXIST_LOCK" == "0" ]; then
   echo -e $GELB"Es traten Fehler beim downloaden der Configs auf."$FARBLOS
 else
-  echo -e $GELB"$CFG1 und $CFG2 wurden in $DIR/$SRCDSDIR/$GAMEMOD/cfg angelegt."$FARBLOS
+  echo -e $GELB"CFGS wurden in $DIR/$SRCDSDIR/$GAMEMOD/cfg angelegt."$FARBLOS
 fi
 ;;
 # ---------------------------------------------------------------------------------------------
