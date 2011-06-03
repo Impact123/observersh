@@ -550,9 +550,7 @@ fi
 preconfigure|12)
 
 # PRECONF ACTIVE CHECK
-if [ "$PRECONFIGURE" == "1" ]; then
-  cd $DIR/$SRCDSDIR/$GAMEMOD/cfg
-else
+if [ ! "$PRECONFIGURE" == "1" ]; then
   echo -e $ROT"Error:$FARBLOS Variable Preconfigure ist nicht auf 1 gesetzt."
   exit
 fi
@@ -561,6 +559,8 @@ fi
 if [ ! -d "$DIR/$SRCDSDIR/$GAMEMOD/cfg" ]; then
   echo "$DIR/$SRCDSDIR/$GAMEMOD/cfg existiert nicht."
   exit
+else
+  cd $DIR/$SRCDSDIR/$GAMEMOD/cfg
 fi
 
 # PRECONFDEL UND BACKUP
@@ -729,17 +729,25 @@ fi
 
 
 # FALLS SCHON VORHANDEN
-if [ -f "$DIR/$2.list" ]; then
+if [ -f "$DIR/$SRCDSDIR/$GAMEMOD/$2.addonlist" ]; then
   echo -ne $GELB"Das Addon $2 scheint schon installiert zu sein.$FARBLOS
   [- wollen sie es dennoch installieren? yes/no: "
-  read addonquestion
+  read ADDON_OVERWRITE_QUESTION
   
   
-    if [ ! "$addonquestion" == "yes" ]; then
+    if [ ! "$ADDON_OVERWRITE_QUESTION" == "yes" ]; then
       clear; echo -e $GELB"Das Addon $2  Wurde nicht installiert"$FARBLOS
       exit
     fi
    
+fi
+
+# ORDNERCHECK
+if [ ! -d "$DIR/$SRCDSDIR/$GAMEMOD" ]; then
+  echo "$DIR/$SRCDSDIR/$GAMEMOD existiert nicht."
+  exit
+else
+  cd $DIR/$SRCDSDIR/$GAMEMOD
 fi
 
 
@@ -758,7 +766,16 @@ fi
 if [ -f "$2.tar.bz2" ]; then
   tar xfvj $2.tar.bz2
   rm $2.tar.bz2
+  
+    # ADDONINSTALL FILE
+    if [ -f "addoninstall.sh" ]; then
+	  chmod 755 addoninstall.sh
+	  ./addoninstall.sh
+	  rm addoninstall.sh
+	fi
+  
   clear; echo -e $GELB"Das Addon $2 wurde erfolgreich installiert."$FARBLOS
+	
 else
   echo -e $GELB"Das Addon $2.tar.bz2 existiert nicht!"$FARBLOS
   exit
@@ -779,10 +796,17 @@ if [ "$2" == "" ]; then
   exit
 fi
 
+# ORDNERCHECK
+if [ ! -d "$DIR/$SRCDSDIR/$GAMEMOD" ]; then
+  echo "$DIR/$SRCDSDIR/$GAMEMOD existiert nicht."
+  exit
+else
+  cd $DIR/$SRCDSDIR/$GAMEMOD
+fi
 
 # PRUFEN UND DEINSTALLIEREN DES ADDONS 
-if [ ! -f "$DIR/$2.list" ]; then
-  echo -e $GELB"Die Addondatei $2.list existiert nicht!"$FARBLOS
+if [ ! -f "$DIR/$SRCDSDIR/$GAMEMOD/$2.addonlist" ]; then
+  echo -e $GELB"Die Addondatei $2.addonlist existiert nicht!"$FARBLOS
   exit
 fi
 
@@ -790,8 +814,8 @@ echo -e $GELB"Einen Moment bitte."$FARBLOS
 sleep 1
 
 # LOESCHFUNKTION
-cat $DIR/$2.list |tr -d "\r" |while read list; do rm -Rf $list; done
-rm $DIR/$2.list
+cat $DIR/$SRCDSDIR/$GAMEMOD/$2.addonlist |tr -d "\r" |while read list; do rm -Rf $list; done
+rm $DIR/$SRCDSDIR/$GAMEMOD/$2.addonlist
 # ---
 clear; echo -e $GELB"Addon $2 wurde geloescht"$FARBLOS
 ;;
@@ -823,10 +847,19 @@ echo "---"
 # ---------------------------------------------------------------------------------------------
 addons|addonlist_local|18)
 
+# ORDNERCHECK
+if [ ! -d "$DIR/$SRCDSDIR/$GAMEMOD" ]; then
+  echo "$DIR/$SRCDSDIR/$GAMEMOD existiert nicht."
+  exit
+else
+  cd $DIR/$SRCDSDIR/$GAMEMOD
+fi
+
 # ADDONCHECK
-if [[ `ls $DIR/*.list` ]]; then
-  ls *.list | grep '\.list$' | sed 's/\.list$//' | sort > $DIR/addonslist.tmp
-  else clear; echo -e $GELB"Es scheinen keine Addons installiert zu sein"$FARBLOS
+if [[ `ls $DIR/$SRCDSDIR/$GAMEMOD/*.addonlist` ]]; then
+  ls *.addonlist |awk -F '.' '{print $1}' | sort > $DIR/addonslist.tmp
+else 
+  clear; echo -e $GELB"Es scheinen keine Addons installiert zu sein"$FARBLOS
   exit
 fi
 

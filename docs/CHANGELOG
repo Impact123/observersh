@@ -129,7 +129,8 @@ Server.sh CHANGELOG
 - Maplistcreater neu geschrieben
   - Test_* Maps werden excludiert
 - Binarycheck zugefuegt
--
+- Addonsystem umgeschrieben.
+  - Nur noch ein Addon fuer alle Spiele notwendig.
 
 
 
