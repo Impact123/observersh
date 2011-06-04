@@ -120,7 +120,7 @@ if [ "$PORT" == "" ]; then
 fi
 
 # DIRWRAPPER
-if [ ! "$DIR_DOESNT_EXIST" == "1" ];then
+if [ ! "$DIR_DOESNT_EXIST" == "1" ]; then
 
     # EXTENSIONDIRCHECK
     if [ ! -d "$DIR/extensions" ]; then 
@@ -132,11 +132,6 @@ if [ ! "$DIR_DOESNT_EXIST" == "1" ];then
       mkdir $DIR/tmp
     fi
 	
-	# TEMPLATEDIRCHECK # --- Next Version ---
-#    if [ ! -d "$DIR/templates" ]; then 
-#      mkdir $DIR/templates
-#    fi
-
 fi
 
  # STARTUP_LOCK CHECKEN
@@ -164,7 +159,7 @@ fi
 start|1)
 # GAMECHECK
 if [ ! -d "$DIR/$SRCDSDIR" ]; then
-  echo -e $ROT"Error:$FARBLOS $SRCDSDIR existiert nicht."
+  echo -e $ROT"Error:$FARBLOS Srcdsdir $SRCDSDIR existiert nicht."
   exit
 fi
 
@@ -212,7 +207,7 @@ fi
 
 # BINARYCHECK
 if [ ! -f "$DIR/$SRCDSDIR/$BINARY" ]; then
-  echo -e $GELB"Binary existiert nicht."$FARBLOS
+  echo -e $GELB"Binary $BINARY existiert nicht."$FARBLOS
   exit
 fi
 
@@ -368,7 +363,7 @@ fi
 
 # SOURCETV_EXTENSION
 if [[ `screen -ls |grep $SCREENNAME-sourcetv` ]]; then
-  echo -e $GELB"SourceTv  Daemon laeuft."$FARBLOS
+  echo -e $GELB"SourceTv Daemon laeuft."$FARBLOS
 fi
 
 # ADVERT_EXTENSION
@@ -495,12 +490,12 @@ if [ ! -f "steam" ]; then
   ./steam -command update
 fi
 
-./steam -command list > games_available.txt
+./steam -command list > $DIR/tmp/games_available.txt
 
 clear; echo "Die Spieleliste wurde von Steam bezogen, und in die Datei games_available.txt geschrieben."
 echo "Diese wird dir nun angezeigt."
 sleep 5
-cat games_available.txt
+cat $DIR/tmp/games_available.txt
 ;;
 # ---------------------------------------------------------------------------------------------
 
@@ -584,13 +579,13 @@ CFG_EXIST_LOCK="0"
 
 # AUTOEXEC.CFG
 if [ -f "$DIR/$SRCDSDIR/$GAMEMOD/cfg/$CFG1" ]; then
-  echo -e $GELB"Autoexec.cfg schon vorhanden."$FARBLOS
+  echo -e $GELB"CFG $CFG1 schon vorhanden."$FARBLOS
   CFG_EXIST_LOCK="$[CFG_EXIST_LOCK+1]"
 fi
 
 # SERVER.CFG
 if [ -f "$DIR/$SRCDSDIR/$GAMEMOD/cfg/$CFG2" ]; then
-  echo -e $GELB"Server.cfg schon vorhanden."$FARBLOS
+  echo -e $GELB"CFG $CFG2 schon vorhanden."$FARBLOS
   CFG_EXIST_LOCK="$[CFG_EXIST_LOCK+1]"
 fi
 
@@ -673,8 +668,8 @@ fi
 # --- 
 echo "" 
 echo -n "Wollen sie jetzt Updaten? yes/no: "
-read updatequestion
-if [ "$updatequestion" == "yes" ]; then
+read UPDATEQUESTION
+if [ "$UPDATEQUESTION" == "yes" ]; then
   wget -q $UPDATEURL
   
     # Archivcheck
@@ -730,13 +725,13 @@ fi
 
 # FALLS SCHON VORHANDEN
 if [ -f "$DIR/$SRCDSDIR/$GAMEMOD/$2.addonlist" ]; then
-  echo -ne $GELB"Das Addon $2 scheint schon installiert zu sein.$FARBLOS
+  echo -ne $GELB"Das Addon '$2' scheint schon installiert zu sein.$FARBLOS
   [- wollen sie es dennoch installieren? yes/no: "
   read ADDON_OVERWRITE_QUESTION
   
   
     if [ ! "$ADDON_OVERWRITE_QUESTION" == "yes" ]; then
-      clear; echo -e $GELB"Das Addon $2  Wurde nicht installiert"$FARBLOS
+      clear; echo -e $GELB"Das Addon '$2' Wurde nicht installiert"$FARBLOS
       exit
     fi
    
@@ -752,19 +747,19 @@ fi
 
 
 # DOWNLOAD DES ADDONS
-echo -e $GELB"Einen Moment bitte."$FARBLOS
+clear; echo -e $GELB"Einen Moment bitte."$FARBLOS
 
 if [[ `wget -q -O- $ADDONURL/$2.tar.bz2` ]]; then
-  clear; echo -e $GELB"Addon $2 wird herruntergeladen"$FARBLOS
+  clear; echo -e $GELB"Addon '$2' wird herruntergeladen"$FARBLOS
   wget -q  $ADDONURL/$2.tar.bz2
-  else echo -e $ROT"Addon $2.tar.bz2 ist nicht auf dem Masterserver vorhanden."$FARBLOS 
+  else echo -e $ROT"Addon '$2.tar.bz2' ist nicht auf dem Masterserver vorhanden."$FARBLOS 
   exit
 fi
 # ---
 
 # VERARBEITUNG DES ADDONS
 if [ -f "$2.tar.bz2" ]; then
-  tar xfvj $2.tar.bz2
+  tar xfvj $2.tar.bz2 > addoninstall_$2.log
   rm $2.tar.bz2
   
     # ADDONINSTALL FILE
@@ -774,10 +769,10 @@ if [ -f "$2.tar.bz2" ]; then
 	  rm addoninstall.sh
 	fi
   
-  clear; echo -e $GELB"Das Addon $2 wurde erfolgreich installiert."$FARBLOS
+  clear; echo -e $GELB"Das Addon '$2' wurde erfolgreich installiert."$FARBLOS
 	
 else
-  echo -e $GELB"Das Addon $2.tar.bz2 existiert nicht!"$FARBLOS
+  echo -e $GELB"Das Addon '$2.tar.bz2' existiert nicht!"$FARBLOS
   exit
 fi
 ;;
@@ -806,7 +801,7 @@ fi
 
 # PRUFEN UND DEINSTALLIEREN DES ADDONS 
 if [ ! -f "$DIR/$SRCDSDIR/$GAMEMOD/$2.addonlist" ]; then
-  echo -e $GELB"Die Addondatei $2.addonlist existiert nicht!"$FARBLOS
+  echo -e $GELB"Die Addondatei '$2.addonlist' existiert nicht!"$FARBLOS
   exit
 fi
 
@@ -814,10 +809,16 @@ echo -e $GELB"Einen Moment bitte."$FARBLOS
 sleep 1
 
 # LOESCHFUNKTION
-cat $DIR/$SRCDSDIR/$GAMEMOD/$2.addonlist |tr -d "\r" |while read list; do rm -Rf $list; done
+cat $DIR/$SRCDSDIR/$GAMEMOD/$2.addonlist |tr -d "\r" |while read ADDONLIST; do rm -Rf $ADDONLIST; done
 rm $DIR/$SRCDSDIR/$GAMEMOD/$2.addonlist
+
+# FALLS INSTALLER LOG VORHANDEN
+if [ -f "addoninstall_$2.log" ]; then
+ rm -f addoninstall_$2.log
+fi
+
 # ---
-clear; echo -e $GELB"Addon $2 wurde geloescht"$FARBLOS
+clear; echo -e $GELB"Addon '$2' wurde geloescht"$FARBLOS
 ;;
 # ---------------------------------------------------------------------------------------------
 
@@ -1038,7 +1039,7 @@ makevdf|vdf|21)
 
 case "$2" in
 # METAMOD
-mm|metamod)
+mm|meta|metamod)
 if [ -d "$DIR/$SRCDSDIR/$GAMEMOD/addons/metamod" ]; then
   echo "\"Plugin\"
   {
