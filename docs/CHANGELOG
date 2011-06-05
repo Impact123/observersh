@@ -131,7 +131,15 @@ Server.sh CHANGELOG
 - Binarycheck zugefuegt
 - Addonsystem umgeschrieben.
   - Nur noch ein Addon fuer alle Spiele notwendig.
-
+  - Vdf´s werden automatisch erstellt.
+- Shebang aus Config entfernt
+- Updateversion Verbessert
+ - Check Falls Features nicht abrufbar
+ - Check falls Contentserver nicht erreichbar
+ - Check falls Version nicht abrufbar
+ - Check falls neue Config benoetigt eird
+ - Falls neue Config benoetigt wird die Config gebackuppt
+ - Fehleranzeige
 
 
 
