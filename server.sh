@@ -634,6 +634,21 @@ VERSIONCHECK_REMOTE="`wget -q -O- $VERSIONURL | fgrep  Version:`"
 FEATURES="`wget -q -O- $FEATURESURL`"
 CONFLOCK="`wget -q -O- $VERSIONURL | fgrep  LOCK=1`"
 
+# UPDATE LOCK AUF 0 SETZEN
+UPDATE_LOCK="0"
+
+# FALLS VERSIONURL NICHT ABRUFBAR
+if [[ ! $FEATURES ]]; then
+  VERSIONCHECK_REMOTE="Version konnte nicht abgerufen werden"
+  UPDATE_LOCK="$[$UPDATE_LOCK+1]"
+fi
+
+# FALLS FEATURES NICHT ABRUFBAR 
+if [[ ! $FEATURES ]]; then
+  FEATURES="Features konnten nicht abgerufen werden."
+  UPDATE_LOCK="$[$UPDATE_LOCK+1]"
+fi
+
 
 echo "Ihre Version:    $VERSION"
 echo "Neuste Version:  $VERSIONCHECK_REMOTE"
@@ -650,20 +665,31 @@ else
   echo "$FEATURES"
 fi
 
+
+# FALLS UPGRADEPAKET NICHT VORHANDEN
+if [[ ! `wget -q -O- $UPDATEURL` ]]; then
+  echo ""
+  echo -e $GELB"Sorry der Contentserver ist zurzeit nicht erreichbar, oder das Upgradepaket fehlt."$FARBLOS
+  UPDATE_LOCK="$[$UPDATE_LOCK+1]"
+fi
+  
+  
+# FALLS UPDATE LOCK NICHT 0
+if [ ! "$UPDATE_LOCK" == "0" ]; then
+  echo ""
+  echo -e $ROT"Error:$FARBLOS Es gab '$UPDATE_LOCK' Fehler, Update kann nicht fortgefuehrt werden."
+  exit
+fi
+
+
 # CONFIGLOCK
 if [[ $CONFLOCK ]]; then
  echo ""
  echo -e $GELB"Wichtig:$FARBLOS Das Update der Vorversion auf $VERSIONCHECK_REMOTE beinhaltet die Configdatei."
- echo "Sie sollten nun daher die Console unberueht lassen,"
- echo "und zB per FTP/SCP/SSH die Configdatei loeschen oder umbennen bevor sie das Update zustimmen."
+ echo "Sie sollten nun daher die Configdatei loeschen oder umbennen, zB per FTP/SFTP/SSH bevor sie das Update zustimmen."
+ echo "Andersfalls wird die Config in den TMP Ordner gebackuppt"
 fi
 
-# FIXME
-# Servercheck
-# if [[ ! `wget -q -O- $UPDATEURL` ]]; then
-# echo "Sorry der Contentserver ist zurzeit nicht erreichbar."
-# exit
-# fi
 
 # --- 
 echo "" 
@@ -679,8 +705,21 @@ if [ "$UPDATEQUESTION" == "yes" ]; then
     fi
 	
 # ---
-cp $0  $0_`$DATE`
-mv $0_* $DIR/tmp
+# SERVER.SH BACKUPPEN
+if [ -f "server.sh" ]; then
+  cp server.sh  server.sh_`$DATE`
+  mv server.sh_* $DIR/tmp
+fi
+
+# SERVER.CONF BACKUPPEN
+if [[ $CONFLOCK ]]; then
+
+  if [ -f "server.conf" ]; then
+    mv server.conf  server.conf_`$DATE`
+    mv server.conf_* $DIR/tmp
+  fi
+
+fi
   
 if [ -f "$DIR/server.conf" ]; then
  # CONFIGMOVE IF EXIST
