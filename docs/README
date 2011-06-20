@@ -184,7 +184,7 @@ ____________________________
 19) cleanup                   - Raeumt den Server auf und entfernt alte Dateien.
 20) cronjob                   - Erstellt einen Taeglichen Cronjob.
 21) makevdf|vdf               - Erstellt .vdf Dateien fuer verschiedene Addons.
-21) help|h                    - Zeigt diese Hilfe an
+22) help|h                    - Zeigt diese Hilfe an
 --------------------------------------
 
 

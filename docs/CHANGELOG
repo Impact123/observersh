@@ -119,7 +119,7 @@ Server.sh CHANGELOG
 - Cleanup Funktion eingebaut.
 
 # xx.xx.2011
-# Version: 0.2.x
+# Version: 0.2.5-Beta
 - Die Cleanup Funktion loescht nun auch SourceTv Demos
 - MakeVDF Funktion zugefuegt
 - Parameterzusatz --nocolors zugefuegt [Test]
@@ -129,6 +129,9 @@ Server.sh CHANGELOG
 - Maplistcreater neu geschrieben
   - Test_* Maps werden excludiert
 - Binarycheck zugefuegt
+- Check ob das angegebenes Verzeichnis das ist in welchem das Script ausgefuehrt wurde
+- Startupcheck Struktur
+- Check ob der Server ordnungsgemaess gestartet wurde -- FIXME --
 - Addonsystem umgeschrieben.
   - Nur noch ein Addon fuer alle Spiele notwendig.
   - Vdf´s werden automatisch erstellt.

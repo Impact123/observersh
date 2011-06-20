@@ -4,12 +4,12 @@
 # Ueber Das Script
 # ---------------------------------------------------------------------------------------------
 # Name:    - Gameserververwaltungsscript fuer Orangebox-Games 
-# Version: - 0.2.4-Beta2
+# Version: - 0.2.5-Beta
 # Author:  - Impact, http://gugy.eu
 # Lizens:  - GPLv3
 # E-Mail:  - support@gugy.eu
 # Web:     - http://gugyclan.eu
-# Datum:   - 22.04.2011
+# Datum:   - 20.06.2011
 #
 #
 #
@@ -32,7 +32,7 @@
 #
 # ---------------------------------------------------------------------------------------------
 
-VERSION="Version: 0.2.4-Beta2"
+VERSION="Version: 0.2.5-Beta"
 
 # FARBEN
 GELB="\033[1;33m"
@@ -55,6 +55,7 @@ else
   echo -e $ROT"Error:$FARBLOS Configdatei fehlt oder Pfad ist falsch."
   # STARTUP_LOCK SETZEN
   STARTUP_LOCK="$[$STARTUP_LOCK+1]"
+  echo ""
 fi
 
 # ADMINCHECK
@@ -62,6 +63,7 @@ if [ "`whoami`" == "root" ]; then
   echo "Verantwortungsvolle Admins starten Gameserver nicht mit dem root User."
   # STARTUP_LOCK SETZEN
   STARTUP_LOCK="$[$STARTUP_LOCK+1]"
+  echo ""
 fi
 
  # QSTATCHECK
@@ -70,6 +72,7 @@ if [[ ! `which $QUAKESTAT` ]]; then
   echo "sie sollten es installieren oder die Variable in der Kopfzeile anpassen."
   # STARTUP_LOCK SETZEN
   STARTUP_LOCK="$[$STARTUP_LOCK+1]"
+  echo ""
 fi
 
 # DIRCHECK
@@ -79,8 +82,9 @@ if [ "$DIR" == "" ]; then
   echo -e $GELB"    [- $(pwd)"$FARBLOS
   # STARTUP_LOCK SETZEN
   STARTUP_LOCK="$[$STARTUP_LOCK+1]"
+  echo ""
 fi
-
+  
 # DIRCHECK2
 if [ ! -d "$DIR" ]; then
   echo -e $ROT"Error:$FARBLOS Das Verzeichnis '$DIR' scheint nicht zu existieren"
@@ -92,6 +96,7 @@ if [ ! -d "$DIR" ]; then
   
   # DIR DOESNT EXIST SETZEN
   DIR_DOESNT_EXIST="1"
+  echo ""
 fi
 
 # SCRENNNAMECHECK
@@ -99,6 +104,7 @@ if [ "$SCREENNAME" == "" ]; then
   echo -e $ROT"Error:$FARBLOS Es wurde kein Screenname angegeben."
   # STARTUP_LOCK SETZEN
   STARTUP_LOCK="$[$STARTUP_LOCK+1]"
+  echo ""
 fi
 
 # IPCHECK
@@ -111,16 +117,28 @@ if [ "$IP" == "" ]; then
   echo -e $GELB"    [- $INET_ADRESS"$FARBLOS
   # STARTUP_LOCK SETZEN
   STARTUP_LOCK="$[$STARTUP_LOCK+1]"
+  echo ""
 fi
 
 if [ "$PORT" == "" ]; then
   echo -e $ROT"Error:$FARBLOS Es wurde kein Port angegeben."
   # STARTUP_LOCK SETZEN
   STARTUP_LOCK="$[$STARTUP_LOCK+1]"
+  echo ""
 fi
 
 # DIRWRAPPER
 if [ ! "$DIR_DOESNT_EXIST" == "1" ]; then
+    
+    # DIRCHECK 3 - IST UNSER VERZEICHNIS DAS RICHTIGE
+    if [ ! "$DIR" == "$(pwd)" ]; then
+      echo -e $ROT"Error:$FARBLOS Das Verzeichnis '$DIR' scheint nicht das richtige Verzeichnis zu sein."
+	  echo    "    [- Der Pfad in welchem sich das Script befindet lautet:"
+      echo -e $GELB"    [- $(pwd)"$FARBLOS
+      # STARTUP_LOCK SETZEN
+      STARTUP_LOCK="$[$STARTUP_LOCK+1]"
+	  echo ""
+    fi
 
     # EXTENSIONDIRCHECK
     if [ ! -d "$DIR/extensions" ]; then 
@@ -159,7 +177,7 @@ fi
 start|1)
 # GAMECHECK
 if [ ! -d "$DIR/$SRCDSDIR" ]; then
-  echo -e $ROT"Error:$FARBLOS Srcdsdir $SRCDSDIR existiert nicht."
+  echo -e $ROT"Error:$FARBLOS Srcdsdir '$SRCDSDIR' existiert nicht."
   exit
 fi
 
@@ -186,8 +204,8 @@ if [[ `screen -ls |grep $SCREENNAME-running` ]]; then
   exit
 fi
 
-# SCREENLOGCHECK
-if [[ `find $DIR/$SRCDSDIR/$LOGDIR/ -type f -name "screenlog.0_*"` ]]; then 
+# SCREENLOGCHECK --- FIXME ---
+if [ -f "$DIR/$SRCDSDIR/screenlog.0" ]; then 
   cd $DIR/$SRCDSDIR
   mv screenlog.0 $LOGDIR
   cd $DIR/$SRCDSDIR/$LOGDIR
@@ -196,7 +214,7 @@ fi
 
 # LOGTIMECHECK
 if [[ `find $DIR/$SRCDSDIR/$LOGDIR/ -type f -name "screenlog.0_*"` ]]; then 
-  find $DIR/$SRCDSDIR/$LOGDIR/ -type f -name "screenlog.0*" -mtime $LOGTIME $LOGEXEC
+  find $DIR/$SRCDSDIR/$LOGDIR/ -type f -name "screenlog.0_*" -mtime $LOGTIME $LOGEXEC
 fi
 
 # PORTCHECK
@@ -207,13 +225,21 @@ fi
 
 # BINARYCHECK
 if [ ! -f "$DIR/$SRCDSDIR/$BINARY" ]; then
-  echo -e $GELB"Binary $BINARY existiert nicht."$FARBLOS
+  echo -e $GELB"Binary '$BINARY' existiert nicht."$FARBLOS
   exit
 fi
 
 cd $DIR/$SRCDSDIR
-screen -$SCREENOPTIONS $SCREENNAME-running ./$BINARY -game $GAMEMOD -port $PORT +ip $IP +map $MAP +maxplayers $MAXPLAYERS $EXTRA 
-echo -e $GELB"Server $SCREENNAME wurde gestartet."$FARBLOS
+screen -$SCREENOPTIONS $SCREENNAME-running ./$BINARY -game $GAMEMOD -port $PORT +ip $IP +map $MAP +maxplayers $MAXPLAYERS $EXTRA
+
+# SERVER STARTED CHECK - IST DER SERVER WIRKLICH GESTARTET?  
+# SLEEP TO LET SOME TIME FOR SCREEN TO CLOSE THE SESSION IF SOMETHING FAILS
+sleep 0.05
+if [[ `screen -ls |grep $SCREENNAME-running` ]]; then
+  echo -e $GELB"Server $SCREENNAME wurde gestartet."$FARBLOS
+else
+  echo -e $GELB"Server $SCREENNAME wurde nicht gestartet, anscheinend gab es einen Fehler."$FARBLOS
+fi
 
 
 # --- EXTENSIONS --- #
@@ -451,7 +477,7 @@ if [ -f "$DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt" ]; then
 fi
 
 if [ ! -d "$DIR/$SRCDSDIR/$GAMEMOD/maps" ]; then
-  echo "Ordner Maps ist nocht vorhanden."
+  echo "Ordner Maps ist nicht vorhanden."
   exit
 else
   cd $DIR/$SRCDSDIR/$GAMEMOD/maps
@@ -1149,7 +1175,7 @@ exit
 
 # WATCHLOG
 # ---------------------------------------------------------------------------------------------
-watchlog)
+watchlog|logwatch|log)
 if [ -f "$DIR/$SRCDSDIR/screenlog.0" ]; then
   echo -e $GELB"--- Log beginnt ---"$FARBLOS
   more $DIR/$SRCDSDIR/screenlog.0
@@ -1175,24 +1201,24 @@ echo ""
 echo "1)  start                     - Startet den Gameserver."
 echo "2)  stop                      - Stoppt den Gameserver."
 echo "3)  restart                   - Restartet den Gameserver."
-echo "4)  update|install            - Updatet/Installiert den Gameserver. | Gleich wie Update."
+echo "4)  update|install            - Updatet/Installiert den Gameserver."
 echo "5)  status                    - Zeigt den Status des Gameservers."
 echo "6)  watch                     - Oeffnet die Screensession des Gameservers."
 echo "7)  watchupdate               - Oeffnet die Screensession des Updaters."
 echo "8)  ping                      - Pingt den Server an und checkt ob er online ist."
-echo "9)  maplistcreate             - Erstellt eine maplist.txt aller .bsp Dateien in standartgemaess srcdsdir/moddir/maps."
-echo "10) listgames                 - Listet alle Spiele die ueber Steam bezogen werden koennen und schreibt sie in games_avaible.txt"
-echo "11) backup                    - Backuppt den Gesamten Gameserver in das Hauptverzeichnis mit Angabe des Datumsformates (siehe unten)."
-echo "12) preconfigure              - Es wird eine Minimale Server/Autoexec\.cfg in standartgemaess srcdsdir/moddir/cfg erstellt."
+echo "9)  maplistcreate             - Erstellt eine maplist/mapcycle\.txt aller .bsp Dateien in standartgemaess srcdsdir/moddir/maps."
+echo "10) listgames                 - Listet alle Spiele auf die ueber Steam bezogen werden koennen und schreibt sie tmp/in games_avaible.txt"
+echo "11) backup                    - Backuppt den Gameserver in das Hauptverzeichnis mit Angabe des Datumsformates (siehe unten)."
+echo "12) preconfigure              - Laed eine Minimale Server/Autoexec\.cfg eingetragenen Masterserver nach standartgemaess srcdsdir/moddir/cfg erstellt."
 echo "13) updateversion             - Prueft die Locale Scriptversion und vergleicht diese mit dem Updateserver"
 echo "                             [- falls eine neue Version vorhanden ist kann sie nach zustimmung geupdatet werden."
 echo "                             [- Die alte Version geht dabei nicht verloren."
 echo "14) version                   - Zeigt lediglich die Version an."
-echo "15) addoninstall              - Laed ein Addon Vom dem in der Config eingetragenen Masterserver und Installiert es."
+echo "15) addoninstall              - Laed ein Addon Von dem in der Config eingetragenen Masterserver und Installiert es."
 echo "16) addonremove               - Loescht ein Addon das Vom Masterserver bezogen werden kann."
 echo "17) addonlist                 - Listet alle Addons auf die ueber den Installer bezogen werden koennen"
 echo "18) addons|addonlist_local    - Listet alle Addons auf die ueber den Installer installiert wurden"
-echo "19) cleanup                   - Entfernt alte Logs, SourceTV Demos, Downloads, und Ztmp Datein."
+echo "19) cleanup                   - Entfernt alte Logs, SourceTV Demos, Downloads und Ztmp Datein."
 echo "20) cronjob|crontab|cron      - Erstellt einen Taeglichen Cronjob"
 echo "21) makevdf|vdf               - Erstellt .vdf Dateien fuer verschiedene Addons."
 echo ""
