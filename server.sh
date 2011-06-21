@@ -9,7 +9,7 @@
 # Lizens:  - GPLv3
 # E-Mail:  - support@gugy.eu
 # Web:     - http://gugyclan.eu
-# Datum:   - 20.06.2011
+# Datum:   - 21.06.2011
 #
 #
 #
@@ -204,7 +204,7 @@ if [[ `screen -ls |grep $SCREENNAME-running` ]]; then
   exit
 fi
 
-# SCREENLOGCHECK --- FIXME ---
+# SCREENLOGCHECK
 if [ -f "$DIR/$SRCDSDIR/screenlog.0" ]; then 
   cd $DIR/$SRCDSDIR
   mv screenlog.0 $LOGDIR
@@ -561,7 +561,7 @@ if [ "$BACKUP_SERVER_STAT" == "ON" ]; then
 else
   clear; echo -e $GELB"Das Backup wurde im Screen $SCREENNAME-backup gestartet."$FARBLOS
 fi
-  ;;
+;;
 # ---------------------------------------------------------------------------------------------
 
 
@@ -657,14 +657,14 @@ fi
 updateversion|13)
 VERSIONCHECK_LOCAL="$VERSION" 
 VERSIONCHECK_REMOTE="`wget -q -O- $VERSIONURL | fgrep  Version:`"
-FEATURES="`wget -q -O- $FEATURESURL`"
+FEATURES="`wget -q -O- $FEATURESURL | grep -v '#'`"
 CONFLOCK="`wget -q -O- $VERSIONURL | fgrep  LOCK=1`"
 
 # UPDATE LOCK AUF 0 SETZEN
 UPDATE_LOCK="0"
 
 # FALLS VERSIONURL NICHT ABRUFBAR
-if [[ ! $FEATURES ]]; then
+if [[ ! $VERSIONCHECK_REMOTE ]]; then
   VERSIONCHECK_REMOTE="Version konnte nicht abgerufen werden"
   UPDATE_LOCK="$[$UPDATE_LOCK+1]"
 fi
@@ -945,7 +945,7 @@ rm $DIR/addonslist.tmp
 # ---------------------------------------------------------------------------------------------
 cleanup|19)
 # WARNINGMESSAGE
-echo -ne $GELB"Achtung$FARBLOS dieses Feature ist noch nicht ausgereift, wollen sie es dennoch nutzen? yes/no: "
+echo -ne $GELB"Achtung$FARBLOS dieses Feature ist experimentell, wollen sie es dennoch nutzen? yes/no: "
   read CLEANUP_WARNING_MESSAGE
 if [ ! "$CLEANUP_WARNING_MESSAGE" == "yes" ]; then
   clear; echo "Ihre Wahl, wir brechen ab." 

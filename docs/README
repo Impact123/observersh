@@ -1,5 +1,5 @@
 # Server.sh README
-# 19.04.2011
+# 21.06.2011
 
 Einleitung:
 Die meisten der auf GuGy.eu angebotenen Scripte sind fuer den Privatgebrauch geschrieben
@@ -15,6 +15,7 @@ Falls es ihnen gefaellt, koennen sie mir Kritik und Verbesserungsvorschlaege an 
 Konfigurationen nehmen sie bitte in der beiliegenden server.conf Datei vor.
 
 
+INFO: Dies ist nur eine allgemeine README, Funktionsbezogene Informationen koennen sie auf der Projektseite ansehen (Siehe unten, Hilfe Support)
 
 
 Abschnitt (1) Installation:
@@ -22,7 +23,7 @@ Abschnitt (1) Installation:
 
 1.) Lesen sie die komplette Readme ein mal durch bevor sie mit der Installation beginnen!
 2.) Entpacken sie das Archiv
-3.) Geben sie falls noch nicht geschehen, der Server.sh Ausfuehrungsberechtigungen.
+3.) Geben sie falls noch nicht geschehen, der Server.sh Ausfuehrungsberechtigungen (Chmod). 
 4.) Passen sie die Konfigurationsdatei an. siehe Pkt2
 
 
@@ -76,12 +77,12 @@ Abschnitt (3) Infos und Hilfe
 Mitgelieferte Dateien:
 
 - server.sh         - Eigentliches Script.
-- server.conf       - Konfigurationsdatei des Scriptes.                  | Wird bei einem Update excludiert falls schon vorhanden.
+- server.conf       - Konfigurationsdatei des Scriptes.                  | Wird bei einem Update excludiert falls vorhanden, bzw gebackuppt falls noetig 
 - make              - Script mit welchem das Tar.gz Archiv gepackt wurde | falls man Backuppen moechte oder aehnliches, wird bei Updates excludiert.
 - version.txt       - Versionsdatei des Scriptes                         | nur als Info fuer den Benutzer und fuer make.
 - docs/README       - Readme Datei des Scriptes
 - docs/CHANGELOG    - Changelog Datei des Scriptes
-- docs/LICENCE      - Lizensdatei
+- docs/LICENCE      - Lizensdatei (GPLv3)
 
 
 
@@ -158,6 +159,8 @@ Templatesurl  - URL von welcher Templates bezogen werden.
 
 Ausfuehrbare Befehle:
 
+Ausfuehrbare Befehle
+Usage: ./server.sh {Code/Befehl}
 Code | Befehl | Beschreibung
 ____________________________
 
@@ -169,20 +172,20 @@ ____________________________
 6)  watch                     - Oeffnet die Screensession des Gameservers.
 7)  watchupdate               - Oeffnet die Screensession des Updaters.
 8)  ping                      - Pingt den Server an und checkt ob er online ist.
-9)  maplistcreate             - Erstellt eine maplist.txt aller .bsp Dateien in standartgemaess srcdsdir/moddir/maps.
-10) listgames                 - Listet alle Spiele die ueber Steam bezogen werden koennen und schreibt sie in games_avaible.txt
-11) backup                    - Backuppt den Gesamten Gameserver in das Hauptverzeichnis mit Angabe des Datumsformates (siehe unten).
-12) preconfigure              - Es wird eine Minimale Server/Autoexec\.cfg in standartgemaess srcdsdir/moddir/cfg erstellt.
+9)  maplistcreate             - Erstellt eine maplist/mapcycle\.txt aller .bsp Dateien in standartgemaess srcdsdir/moddir/maps.
+10) listgames                 - Listet alle Spiele auf die ueber Steam bezogen werden koennen und schreibt sie tmp/in games_avaible.txt
+11) backup                    - Backuppt den Gameserver in das Hauptverzeichnis mit Angabe des Datumsformates (siehe unten).
+12) preconfigure              - Laed eine Minimale Server/Autoexec\.cfg eingetragenen Masterserver nach standartgemaess srcdsdir/moddir/cfg erstellt.
 13) updateversion             - Prueft die Locale Scriptversion und vergleicht diese mit dem Updateserver
                              [- falls eine neue Version vorhanden ist kann sie nach zustimmung geupdatet werden.
                              [- Die alte Version geht dabei nicht verloren.
-14) version                    - Zeigt lediglich die Version an.
-15) addoninstall              - Laed ein Addon Vom dem in der Config eingetragenen Masterserver und Installiert es.
+14) version                   - Zeigt lediglich die Version an.
+15) addoninstall              - Laed ein Addon Von dem in der Config eingetragenen Masterserver und Installiert es.
 16) addonremove               - Loescht ein Addon das Vom Masterserver bezogen werden kann.
 17) addonlist                 - Listet alle Addons auf die ueber den Installer bezogen werden koennen
 18) addons|addonlist_local    - Listet alle Addons auf die ueber den Installer installiert wurden
-19) cleanup                   - Raeumt den Server auf und entfernt alte Dateien.
-20) cronjob                   - Erstellt einen Taeglichen Cronjob.
+19) cleanup                   - Entfernt alte Logs, SourceTV Demos, Downloads und Ztmp Datein.
+20) cronjob|crontab|cron      - Erstellt einen Taeglichen Cronjob
 21) makevdf|vdf               - Erstellt .vdf Dateien fuer verschiedene Addons.
 22) help|h                    - Zeigt diese Hilfe an
 --------------------------------------
@@ -205,14 +208,20 @@ info@gugy.eu
 Wenn sie einen Fehler, Bug, oder Featurewunsch melden moechten:
 
 Achten sie darauf einen Aussagekraeftigen Titel zu waehlen.
-Geben sie moeglichst viele Informationen an.
+Geben sie moeglichst viele Informationen an, sehr wichtig sind folgende:
+ - Welches System setzten sie ein
+   - 32/64 Bit
+ - Welche Version setzen sie ein 
+ - Was haben sie eingegeben
+ - Kompletter Fehlercode
+ - Komplette Configdatei
 --------------------------------------
 
 			 
 Bekannte Probleme:
 --------------------------------------
 - Bei Servern unter 10 Slots wird die Slotanzahl in der Statusfunktion falsch ausgegeben
-- Bei Erstellung von Cronjobs wird mit der Ausgabe "Term Variable not set" gemeckert
+- Bei Erstellung von Cronjobs wird mit der Ausgabe "Term Variable not set" noticed
 --------------------------------------
  
  

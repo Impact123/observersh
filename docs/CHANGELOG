@@ -118,7 +118,7 @@ Server.sh CHANGELOG
 - Wrapper fuer Verzeichnisabfragen
 - Cleanup Funktion eingebaut.
 
-# xx.xx.2011
+# 21.06.2011
 # Version: 0.2.5-Beta
 - Die Cleanup Funktion loescht nun auch SourceTv Demos
 - MakeVDF Funktion zugefuegt
