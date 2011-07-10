@@ -874,7 +874,7 @@ echo -e $GELB"Einen Moment bitte."$FARBLOS
 sleep 1
 
 # LOESCHFUNKTION
-cat $DIR/$SRCDSDIR/$GAMEMOD/$2.addonlist |tr -d "\r" |while read ADDONLIST; do rm -Rf $ADDONLIST; done
+cat $DIR/$SRCDSDIR/$GAMEMOD/$2.addonlist | tr -d "\r" | tr -s '\n' | while read ADDONLIST; do rm -Rf $ADDONLIST; done
 rm $DIR/$SRCDSDIR/$GAMEMOD/$2.addonlist
 
 # FALLS INSTALLER LOG VORHANDEN
