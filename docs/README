@@ -1,10 +1,11 @@
-# Server.sh README
+# Server.sh README -- Developerversion
 # 07.07.2011
 
 Einleitung:
 Die meisten der auf GuGy.eu angebotenen Scripte sind fuer den Privatgebrauch geschrieben, und damit zum Teil an eigenen Beduerfnisse angepasst.
 Das heisst, diese Scripte koennten bei ihnen je nach Konfiguration komplett anders funktionieren.
-Bedenken sie bitte, dass ich dafuer keine Verantwortug uebernehmen kann, und mich hiermit von jeglichen moeglicherweise auftretenden Problemen  direkter oder indirekter Art distanziere.
+Bedenken sie bitte, dass ich dafuer keine Verantwortug uebernehmen kann,
+und mich hiermit von jeglichen moeglicherweise auftretenden Problemen direkter oder indirekter Art distanziere.
 Verwendung des Scriptes auf eigene Gefahr.
 
 
@@ -14,6 +15,70 @@ Konfigurationen nehmen sie bitte in der beiliegenden server.conf Datei vor.
 
 
 INFO: Dies ist nur eine allgemeine README, Funktionsbezogene Informationen koennen sie auf der Projektseite ansehen (Siehe unten: Hilfe, Support)
+
+
+
+
+BESONDERHEITEN DES SCRIPTES
+--------------------------------------
+	- Updater
+		- Einfache Updates gewaehrt durch:
+			- Gleich bleibende URL
+			- .
+		- Integrierte Funktion um bei Updates Backups des Scriptes so wie der Config zu erstellen.
+		
+	- Portcheck
+		- Checkt vor Start des Gameserver ob der angegebene Port bereits benutzt wird, um Komplikationen zu vermeiden.
+		
+	- Addoninstaller
+		- Eines der Extras welches besonders hervorgehoben werden muss, es ist in der Lage vorgefertigte Addons zu:
+			- Installieren
+			- Reinstallieren
+			- Entfernen
+	
+	- Extensions
+		- Nuetzliche Extensions die den Umfang des Scriptes erweitern, entweder als pure Extension oder Standalone.
+	
+	- CleanupFunktion
+		- Entfernt den Gameserver von unnuetzen ballast wie:
+			- SourceTv Demos
+			- Ztmp Dateien
+			- Alte Logs
+			- Alte Downloads
+		
+	- BackupFunktion
+		- Backuppt nur die essentiellen Dateien des Gameservers, damit nur der Platz benutzt wird der gebraucht wird.
+		
+	- PreconfigureFunktion
+		- Installiert vorgefertigte zumeist kommentierte Minimal Configs um die Arbeit zu ersparen.
+		
+	- CronjobCreater
+		- Macht es einfach einen oder mehrere automatisierte taegliche Jobs anzulegen, zB um den Server zu restarten.
+		
+	- MaplistCreater
+		- Erstellt automatisch eine Mapcycle.txt, Maplist.txt der Maps, mit excludierung von test_ Maps.
+		
+	- StatusFunktion 
+		- Playeranzahl
+		- Map
+		- IP
+		- PORT
+		- ServerName
+		
+	- MAIN
+		- Auslesen der IP, Ordner
+		
+	- Vdfmaker
+		- Eine Funktion die zB fuer den Addoninstaller genutzt wird um ein Addon fuer mehrere Spiele zu nutzen.
+	
+	- Watchlog
+		- Zeigt den letzten Screenlog an.
+		
+	
+
+
+
+--------------------------------------
 
 
 
@@ -158,7 +223,7 @@ Wenn das Script ausgefuehrt wird, erstellt es folgende Ordner um bestimmte Funtk
 
 Abschnitt: 3.3 - Bevor man das Script verwendet
 --------------------------------------
-Das Script greift unter anderem auf folgende Programme zurueck, daher sollten sie diese installiert haben:
+Das Script und/oder zugehoerige Extensions greifen unter anderem auf folgende Programme zurueck, daher sollten sie diese installiert haben:
 
 	- Bzip2
 	- Screen
@@ -168,12 +233,14 @@ Das Script greift unter anderem auf folgende Programme zurueck, daher sollten si
 	- Grep*
 	- Date*
 	- Find*
+	- Lftp**
 
 * Normalerweise bei System dabei.
+** Haefuig von Extensions genutzt
 
-Versichern sie sich auch, dass sie alle noetigen Bibliotheken installiert haben die sie brauchen,
-ein Haeufiger Fehler ist das nicht existieren der ia32-libs bei 64 Bit Systemen.
----------------------------------------------------------------------------------------------
+Versichern sie sich auch, dass sie alle noetigen Bibliotheken installiert haben die sie brauchen.
+Ein Haeufiger Fehler ist zB das nicht existieren der ia32-libs bei 64 Bit Systemen.
+--------------------------------------
 
 
 
@@ -204,7 +271,7 @@ Sometext -- FIXME
 
 Abschnitt: 3.4 - Erklaerung der Parameter
 --------------------------------------
-Sometext -- FIXME
+Folgende Parameter gibt es in der Config ein zu stellen.
 
 	Dir           - Kompletter Pfad zum Hauptordner des Servers zB /home/css/work (Geben sie bitte keinen Slash am Ende an).
 	Screenname    - Name des Screen Sockets unter welchem der Server spaeter laufen wird (Siehe oben).
@@ -236,7 +303,7 @@ Sometext -- FIXME
 
 Abschnitt: 3.5 - Ausfuehrbare Befehle
 --------------------------------------
-Folgende Befehle koennen sie benutzen
+Folgende Befehle koennen sie benutzen.
 
 Usage: ./server.sh {Code/Befehl}
 Code | Befehl | Beschreibung
@@ -315,7 +382,7 @@ Geben sie moeglichst viele Informationen an, sehr wichtig sind folgende:
 	- Was haben sie eingegeben
 	
 	- Kompletter Fehlercode
-		Am besten exact der Ausgabe inclusive Format
+		Am besten exakt der Ausgabe, inklusive Formatierung
 		
 	- Komplette Configdatei
 --------------------------------------
@@ -324,8 +391,6 @@ Geben sie moeglichst viele Informationen an, sehr wichtig sind folgende:
 
 
 Abschnitt: 4.3 - Bekannte Probleme
---------------------------------------
-Bekannte Probleme:
 --------------------------------------
 - Bei Servern unter 10 Slots wird die Slotanzahl in der Statusfunktion falsch ausgegeben
 - Bei Erstellung von Cronjobs wird mit der Ausgabe "Term Variable not set" noticed

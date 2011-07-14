@@ -1,5 +1,5 @@
 Server.sh CHANGELOG
-# 22.04.2011
+# 07.07.2011
 
 
  
@@ -13,6 +13,9 @@ Server.sh CHANGELOG
 - Maplistcreate zugefuegt.
 - Kleine bugs gefixt.      
  
+ 
+ 
+ 
   09.12.10
 - Kleinere Syntaxfehler beseitigt.
 - Updatefehler beseitigt.
@@ -22,10 +25,16 @@ Server.sh CHANGELOG
 - Kleine Aenderung im Statusbefehl.
 - Parameterpruefung.
 
+
+
+
   10.12.10
 - Logdircheck ueberarbeitet. 
 - Logtime zugefuegt.
 - Logexec zugefuegt.   
+
+
+
 
   17.12.10
 - Restart ueberarbeitet.
@@ -35,10 +44,16 @@ Server.sh CHANGELOG
 - Logfunktion Ueberarbeitet.
 - Statusanzeige komplett ueberarbeitet.
 
+
+
+
   19.12.10
 - Script auf Configdatei umgestellt
 - Bugs in Update gefixt
 - Weitere Fixes     
+
+
+
 
 20.12.10
 - Doppelstarts gefixt
@@ -46,12 +61,16 @@ Server.sh CHANGELOG
 - Screenamen von status-name zu name-status geaendert
  
 
+ 
+ 
 21.12.10
 - Kleine Rechtschreibfehler ausgebessert
 - Portcheck eingebaut
 - Configlock eingebaut | Pruefung ob ein Update der Config notwendig ist.
 - Farbcodes eingebaut.
 - Script auf komplette Pfade umgestellt
+
+
 
 
 26.12.10
@@ -61,47 +80,81 @@ Server.sh CHANGELOG
 - Funktion Addonlist zugefuegt.
 
 
+
+
 04.01.11
 - Addoninstall Check ob Addon schon installiert ist | Abfrage der erneuten Installation
 - Funktion addons|addonlist_local eingebaut
 - Kleine Fixes
       
 	   
+	   
+	   
 16.01.11
 - Weitere Variablen in den Cfgcreater eingebaut
 - Backupparameter erweitert
 
+
+
+
 06.03.11
 - Kleinen Fehler beim Farbcode ausgebessert
 
+
+
+
 29.03.11
 - Extension funktion fuer SourceTv Extension eingebaut
-       
+
+
+
+
 03.04.11
 - Extension funktion fuer Advert Extension eingebaut
 - Status fuer Extensions zugefuegt
+
+
+
 	   	   
 04.04.11
 - Befehlcodes zugefuegt
 
+
+
+
 05.04.11
 - Cronjob Generator fuer taegliche Cronjobs zugefuegt [BETA]
+
+
+
 
 10.04.11
 - Cronjob Generator bearbeitet
 - Kleinere Codefixes	   	   
 
+
+
+
 13.04.11
 - Code ueberarbeitet/verduennt
 - Kleinere fixes	
+
+
+
 
 15.04.11
 - Status ueberarbeitet
 - if else Abfragen minimiert
 
+
+
+
 16.04.11
 - Addonlist Fehler gefixt
 - Fehler in Hilfsausgabe gefixt
+
+
+
 
 # 22.04.2011
 # Version: 0.2.4-Beta2
@@ -117,6 +170,9 @@ Server.sh CHANGELOG
 - Bei Startfehler erscheint nun die Anzahl der Fehler.
 - Wrapper fuer Verzeichnisabfragen
 - Cleanup Funktion eingebaut.
+
+
+
 
 # 21.06.2011
 # Version: 0.2.5-Beta
@@ -144,5 +200,13 @@ Server.sh CHANGELOG
  - Falls neue Config benoetigt wird die Config gebackuppt
  - Fehleranzeige
 
+ 
+ 
+ 
+# xx.xx.2011
+# Version: 0.2.xx
+- Grosses Update der README
+- Es wurde ein Bug in der addonremove Funktion behoben, wo es passieren kann, dass Leerzeichen in addon.addonlist Probleme während Entfernung verursachen. 
+- Ein Ordnercheck-Bug in Addoninstall wurde gefixt
 
 

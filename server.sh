@@ -787,6 +787,13 @@ if [ "$2" == "" ]; then
   exit
 fi
 
+# ORDNERCHECK
+if [ ! -d "$DIR/$SRCDSDIR/$GAMEMOD" ]; then
+  echo "$DIR/$SRCDSDIR/$GAMEMOD existiert nicht."
+  exit
+else
+  cd $DIR/$SRCDSDIR/$GAMEMOD
+fi
 
 # FALLS SCHON VORHANDEN
 if [ -f "$DIR/$SRCDSDIR/$GAMEMOD/$2.addonlist" ]; then
@@ -801,15 +808,6 @@ if [ -f "$DIR/$SRCDSDIR/$GAMEMOD/$2.addonlist" ]; then
     fi
    
 fi
-
-# ORDNERCHECK
-if [ ! -d "$DIR/$SRCDSDIR/$GAMEMOD" ]; then
-  echo "$DIR/$SRCDSDIR/$GAMEMOD existiert nicht."
-  exit
-else
-  cd $DIR/$SRCDSDIR/$GAMEMOD
-fi
-
 
 # DOWNLOAD DES ADDONS
 clear; echo -e $GELB"Einen Moment bitte."$FARBLOS
@@ -874,7 +872,10 @@ echo -e $GELB"Einen Moment bitte."$FARBLOS
 sleep 1
 
 # LOESCHFUNKTION
-cat $DIR/$SRCDSDIR/$GAMEMOD/$2.addonlist | tr -d "\r" | tr -s '\n' | while read ADDONLIST; do rm -Rf $ADDONLIST; done
+cat $DIR/$SRCDSDIR/$GAMEMOD/$2.addonlist | tr -d '\r' | tr -s '\n' | while read ADDONLIST; do
+  rm -Rf $ADDONLIST
+done
+
 rm $DIR/$SRCDSDIR/$GAMEMOD/$2.addonlist
 
 # FALLS INSTALLER LOG VORHANDEN
