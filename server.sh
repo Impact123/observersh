@@ -115,7 +115,6 @@ if [[ "$(/sbin/ifconfig $DEVICE |grep "inet Adresse:"| awk '{ print $2}' |awk -F
 else
   INET_ADRESS="$(/sbin/ifconfig $DEVICE |grep "inet addr:"| awk '{ print $2}' |awk -F: '{print $2}')"
 fi
-# --- FIXME
 
 if [ "$IP" == "" ]; then
   echo -e $ROT"Error:$FARBLOS Es wurde keine IP angegeben."
@@ -568,12 +567,13 @@ if [[ `screen -ls |grep $SCREENNAME-backup` ]]; then
  exit
 fi
 
-# BACKUPS NACH TMP SCHIEBEN FALLS VORHANDEN --- FIXME ---
-if [[ `find $DIR/ -name "$SCREENNAME*.tar.gz"` ]]; then
-  mv -f $SCREENNAME*.tar.gz $DIR/tmp
+# CHECK OB ARCHIV BEREITS BESTEHT
+if [ -f "tmp/$SCREENNAME.`$DATE`.tar.gz" ]; then
+  echo -e $GELB"Ein Backuparchiv mit diesem Datum existiert bereits, bitte warten sie einen Augenblick"$FARBLOS
+  exit
 fi
 
-screen -dmS $SCREENNAME-backup nice -n 19 tar cfvz $SCREENNAME.`$DATE`.tar.gz $BACKUP_FILES
+screen -dmS $SCREENNAME-backup nice -n 19 tar cfvz  tmp/$SCREENNAME.`$DATE`.tar.gz $BACKUP_FILES 
 if [ "$BACKUP_SERVER_STAT" == "ON" ]; then
   clear; echo -e $GELB"Der Server $SCREENNAME wurde gestoppt, und das Backup wurde im Screen $SCREENNAME-backup gestartet."$FARBLOS
 else
@@ -963,18 +963,10 @@ rm $DIR/addonslist.tmp
 # CLEANUP
 # ---------------------------------------------------------------------------------------------
 cleanup|19)
-# WARNINGMESSAGE
-echo -ne $GELB"Achtung$FARBLOS dieses Feature ist experimentell, wollen sie es dennoch nutzen? yes/no: "
-  read CLEANUP_WARNING_MESSAGE
-if [ ! "$CLEANUP_WARNING_MESSAGE" == "yes" ]; then
-  clear; echo "Ihre Wahl, wir brechen ab." 
-  exit
-fi  
-  
 
 # ZTMP
 # ---------------
-echo "Loesche alte ztmp Dateien..."
+echo "Loesche alte Ztmp Dateien..."
 # COUNT FILES
 find $DIR/$SRCDSDIR/$GAMEMOD/ -name "*.ztmp" -mtime $LOGTIME | wc -l > $DIR/tmp/cleanup_ztmp_count.tmp
 find $DIR/$SRCDSDIR/$GAMEMOD/ -name "*.ztmp" -mtime $LOGTIME $LOGEXEC
@@ -994,8 +986,12 @@ sleep 2
 # ---------------
 echo "Loesche alte Log Dateien..."
 # COUNT FILES
+# CHECK OB ORDNER VORHANDEN DOWNLOADS
+if [ -d "$DIR/$SRCDSDIR/$GAMEMOD/logs" ]; then
 find $DIR/$SRCDSDIR/$GAMEMOD/logs/ -type f -name "*.log" -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_log_count.tmp
 find $DIR/$SRCDSDIR/$GAMEMOD/logs/ -type f -name "*.log" -mtime +$LOGTIME $LOGEXEC
+fi
+
 
 # AMOUNT OF REMOVED FILES
 if [ -f "$DIR/tmp/cleanup_log_count.tmp" ]; then
@@ -1070,7 +1066,7 @@ sleep 2
 # ---------------
 
 clear; echo -e $GELB"Server wurde aufgeraeumt."$FARBLOS
-echo "Es wurden: '$CLEANUP_ZTMP_COUNT' Ztmp Dateien, '$CLEANUP_LOG_COUNT' Log Dateien, '$CLEANUP_DEMO_COUNT' Demo/SourceTv Dateien, '$CLEANUP_DOWNLOADS_LISTS_COUNT' DownloadLists, und '$CLEANUP_DOWNLOADS_COUNT' Download/s entfernt."
+echo "Es wurden: '$CLEANUP_ZTMP_COUNT' Ztmp Dateien, '$CLEANUP_LOG_COUNT' Logs, '$CLEANUP_DEMO_COUNT' SourceTv-Demos, '$CLEANUP_DOWNLOADS_LISTS_COUNT' DownloadLists, und '$CLEANUP_DOWNLOADS_COUNT' Downloads entfernt."
 ;;
 # ---------------------------------------------------------------------------------------------
 
@@ -1095,7 +1091,7 @@ echo -n "Aktion des Cronjobs {update/restart...}: "
   read CRONJOB_ACTION
  clear 
 
-# IF CRON ALREADY EXIST --- FIXME ---
+# IF CRON ALREADY EXIST
 if [ -f "$DIR/tmp/cron-$SCREENNAME-$CRONJOB_ACTION" ]; then
   echo -e $GELB"Eine Cronjob-file mit dieser Aufgabe existiert bereits."$FARBLOS
   echo -n "Wollen sie diese Datei ueberschreiben? yes/no: "
