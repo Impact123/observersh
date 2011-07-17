@@ -109,7 +109,13 @@ fi
 
 # IPCHECK
 DEVICE="eth0"
-INET_ADRESS="`/sbin/ifconfig $DEVICE |grep "inet addr:"| awk '{ print $2}' |awk -F: '{print $2}'`"
+# GERMAN / ENGLISH SYSTEM CHECK
+if [[ "$(/sbin/ifconfig $DEVICE |grep "inet Adresse:"| awk '{ print $2}' |awk -F: '{print $2}')" ]]; then
+  INET_ADRESS="$(/sbin/ifconfig $DEVICE |grep "inet Adresse:"| awk '{ print $2}' |awk -F: '{print $2}')"
+else
+  INET_ADRESS="$(/sbin/ifconfig $DEVICE |grep "inet addr:"| awk '{ print $2}' |awk -F: '{print $2}')"
+fi
+# --- FIXME
 
 if [ "$IP" == "" ]; then
   echo -e $ROT"Error:$FARBLOS Es wurde keine IP angegeben."
@@ -366,13 +372,25 @@ if [[ `screen -ls |grep $SCREENNAME-running` ]]; then
   clear; echo -e $GELB"Server $SCREENNAME laeuft zurzeit."$FARBLOS
 fi
 
+# FALLS SERVER ANPINGBAR
 if [ ! "`$QUAKESTAT -$QSTAT $IP:$PORT | grep -v ADDRESS | awk '{ print $2 }' | awk -F/ ' { print $1}'`" == "DOWN" ]; then
-  echo "---"
-  echo "ServerName: `$QUAKESTAT -a2s $IP:$PORT |grep -v 'ADDRESS' |awk -F \"$GAMEMOD\" '{print $2}' |tr -d ' '`"
-  echo "ServerAddress: `$QUAKESTAT -$QSTAT $IP:$PORT |grep -v 'ADDRESS' |awk '{print $1}'`"
-  echo "Map: `$QUAKESTAT -$QSTAT $IP:$PORT |grep -v 'ADDRESS' |awk  '{print $3}'`"
-  echo "Players: `$QUAKESTAT -$QSTAT $IP:$PORT |grep -v 'ADDRESS' |awk  '{print $2}'`"
-  echo "---"
+
+# FALLS UNTER 10 SPIELER
+  if [[ ! "$($QUAKESTAT -$QSTAT $IP:$PORT |grep -v 'ADDRESS' |awk '{print $2}' |awk -F '/' '{print $2}')" == "$MAXPLAYERS" ]]; then
+    echo "---"
+    echo "ServerName: `$QUAKESTAT -a2s $IP:$PORT |grep -v 'ADDRESS' |awk -F "$GAMEMOD" '{print $2}' |tr -d ' '`"
+    echo "ServerAddress: `$QUAKESTAT -$QSTAT $IP:$PORT |grep -v 'ADDRESS' |awk '{print $1}'`"
+    echo "Map: `$QUAKESTAT -$QSTAT $IP:$PORT |grep -v 'ADDRESS' |awk  '{print $4}'`"
+    echo "Players: `$QUAKESTAT -$QSTAT $IP:$PORT |grep -v 'ADDRESS' |awk  '{print $2,$3}' |tr -d ' '`"
+    echo "---"
+  else
+    echo "---"
+    echo "ServerName: `$QUAKESTAT -a2s $IP:$PORT |grep -v 'ADDRESS' |awk -F "$GAMEMOD" '{print $2}' |tr -d ' '`"
+    echo "ServerAddress: `$QUAKESTAT -$QSTAT $IP:$PORT |grep -v 'ADDRESS' |awk '{print $1}'`"
+    echo "Map: `$QUAKESTAT -$QSTAT $IP:$PORT |grep -v 'ADDRESS' |awk  '{print $3}'`"
+    echo "Players: `$QUAKESTAT -$QSTAT $IP:$PORT |grep -v 'ADDRESS' |awk  '{print $2}'`"
+    echo "---"
+  fi
 fi
 
 # UPDATE
@@ -974,7 +992,7 @@ sleep 2
 
 # LOGS
 # ---------------
-echo "Loesche alte log Dateien..."
+echo "Loesche alte Log Dateien..."
 # COUNT FILES
 find $DIR/$SRCDSDIR/$GAMEMOD/logs/ -type f -name "*.log" -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_log_count.tmp
 find $DIR/$SRCDSDIR/$GAMEMOD/logs/ -type f -name "*.log" -mtime +$LOGTIME $LOGEXEC
@@ -994,15 +1012,12 @@ sleep 2
 # ---------------
 echo "Loesche alte Download Dateien..."
 # COUNT FILES
-find $DIR/$SRCDSDIR/$GAMEMOD/downloads/ -type f -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_downloads_count.tmp
-find $DIR/$SRCDSDIR/$GAMEMOD/DownloadLists/ -type f -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_downloads2_count.tmp
-# PUT IN DLL
-echo $(( `cat $DIR/tmp/cleanup_downloads_count.tmp` + `cat $DIR/tmp/cleanup_downloads2_count.tmp`)) > $DIR/tmp/cleanup_downloads_count.tmp
-rm -f $DIR/tmp/cleanup_downloads2_count.tmp
+# CHECK OB ORDNER VORHANDEN DOWNLOADS
+if [ -d "$DIR/$SRCDSDIR/$GAMEMOD/downloads" ]; then
+  find $DIR/$SRCDSDIR/$GAMEMOD/downloads/ -type f -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_downloads_count.tmp
+  find $DIR/$SRCDSDIR/$GAMEMOD/downloads/ -type f -mtime +$LOGTIME $LOGEXEC
+fi
 
-# REMOVE FILES
-find $DIR/$SRCDSDIR/$GAMEMOD/downloads/ -type f -mtime +$LOGTIME $LOGEXEC
-find $DIR/$SRCDSDIR/$GAMEMOD/DownloadLists/ -type f -mtime +$LOGTIME $LOGEXEC
 
 # AMOUNT OF REMOVED FILES
 if [ -f "$DIR/tmp/cleanup_downloads_count.tmp" ]; then
@@ -1010,6 +1025,28 @@ if [ -f "$DIR/tmp/cleanup_downloads_count.tmp" ]; then
   rm -f $DIR/tmp/cleanup_downloads_count.tmp
 else
   CLEANUP_DOWNLOADS_COUNT="Error beim lesen der Datei."
+fi
+sleep 2
+# ---------------
+
+
+# DOWNLOADS LISTS
+# ---------------
+echo "Loesche alte DownloadLists..."
+# COUNT FILES
+# CHECK OB ORDNER VORHANDEN DOWNLOADS
+if [ -d "$DIR/$SRCDSDIR/$GAMEMOD/DownloadLists" ]; then
+  find $DIR/$SRCDSDIR/$GAMEMOD/DownloadLists/ -type f -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_downloads_lists_count.tmp
+  find $DIR/$SRCDSDIR/$GAMEMOD/DownloadLists/ -type f -mtime +$LOGTIME $LOGEXEC
+fi
+
+
+# AMOUNT OF REMOVED FILES
+if [ -f "$DIR/tmp/cleanup_downloads_lists_count.tmp" ]; then
+  CLEANUP_DOWNLOADS_LISTS_COUNT="`cat $DIR/tmp/cleanup_downloads_lists_count.tmp`"
+  rm -f $DIR/tmp/cleanup_downloads_lists_count.tmp
+else
+  CLEANUP_DOWNLOADS_LISTS_COUNT="Error beim lesen der Datei."
 fi
 sleep 2
 # ---------------
@@ -1033,7 +1070,7 @@ sleep 2
 # ---------------
 
 clear; echo -e $GELB"Server wurde aufgeraeumt."$FARBLOS
-echo "Es wurden: '$CLEANUP_ZTMP_COUNT' Ztmp Dateien, '$CLEANUP_LOG_COUNT' Log Dateien, '$CLEANUP_DEMO_COUNT' Demo/SourceTv Dateien, und '$CLEANUP_DOWNLOADS_COUNT' Download/s entfernt."
+echo "Es wurden: '$CLEANUP_ZTMP_COUNT' Ztmp Dateien, '$CLEANUP_LOG_COUNT' Log Dateien, '$CLEANUP_DEMO_COUNT' Demo/SourceTv Dateien, '$CLEANUP_DOWNLOADS_LISTS_COUNT' DownloadLists, und '$CLEANUP_DOWNLOADS_COUNT' Download/s entfernt."
 ;;
 # ---------------------------------------------------------------------------------------------
 
