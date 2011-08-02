@@ -45,9 +45,11 @@ BESONDERHEITEN DES SCRIPTES
 			- Ztmp Dateien
 			- Alte Logs
 			- Alte Downloads
+			- Alte DownloadLists
 		
 	- BackupFunktion
-		- Backuppt nur die essentiellen Dateien des Gameservers, damit nur der Platz benutzt wird der gebraucht wird.
+		- Backuppt nur die essentiellen Dateien des Gameservers, damit nur der Platz beansprucht wird der gebraucht wird.
+		- Mehrere Formate
 		
 	- PreconfigureFunktion
 		- Installiert vorgefertigte zumeist kommentierte Minimal Configs um die Arbeit zu ersparen.
@@ -61,12 +63,12 @@ BESONDERHEITEN DES SCRIPTES
 	- StatusFunktion 
 		- Playeranzahl
 		- Map
-		- IP
-		- PORT
+		- Ip
+		- Port
 		- ServerName
 		
 	- MAIN
-		- Auslesen der IP, Ordner
+		- Auslesen der IP, Portcheck
 		
 	- Vdfmaker
 		- Eine Funktion die zB fuer den Addoninstaller genutzt wird um ein Addon fuer mehrere Spiele zu nutzen.
@@ -293,6 +295,7 @@ Folgende Parameter gibt es in der Config ein zu stellen.
 	Preconfdel    - Falls auf 1 gesetzt werden falls vorhanden, Die Server/Autoexec\.cfg gebackuppt und neue erstellt.
 	Quakestat     - Auf nicht Debian Systemen unterscheiden sich die Qstat Binarys namentlich, falls kein Debian im Einsatz ist muss diese Variable moeglicherweise angepasst werden. 
 	Backup_files  - Die Dateien des Gameservers welche gebackuppt werden (Siehe Abschnitt 2.).
+	Backup_format - Format mit welchen die Backupps erstellt werden, (tar|tar.gz|tar.bz2)
 	Addonurl      - URL von welcher Addons fuer den Installer bezogen werden.
 	Cron_logging  - Hiermit wird beeinflusst ob Cronjobs Logfiles erstellen.
 	Templatesurl  - URL von welcher Templates bezogen werden.
@@ -392,8 +395,7 @@ Geben sie moeglichst viele Informationen an, sehr wichtig sind folgende:
 
 Abschnitt: 4.3 - Bekannte Probleme
 --------------------------------------
-- Bei Servern unter 10 Slots wird die Slotanzahl in der Statusfunktion falsch ausgegeben
-- Bei Erstellung von Cronjobs wird mit der Ausgabe "Term Variable not set" noticed
+	
 --------------------------------------
 
 

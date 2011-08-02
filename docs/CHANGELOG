@@ -208,5 +208,19 @@ Server.sh CHANGELOG
 - Grosses Update der README
 - Es wurde ein Bug in der addonremove Funktion behoben, wo es passieren kann, dass Leerzeichen in addon.addonlist Probleme während Entfernung verursachen. 
 - Ein Ordnercheck-Bug in Addoninstall wurde gefixt
+- IP-Check ueberarbeitet
+ - Check ob deutsches System
+- Status Anzeige ueberarbeitet
+ - Bug bei unter 10 Spieler behoben
+- Cleanup Funktion ueberarbeitet
+ - Check ob Ordner existieren
+- Backup ueberarbeitet
+  - Backupps werden nun direkt nach tmp/ gebackuppt
+  - Check ob Archiv bereits besteht
+  - Mehrere Formate zur Auswahl (tar|tar.gz|tar.bz2).
+- Script wurde auf Functions umgestellt
+- Parameterzusaetze --nocolors und -c zugefuegt
+
+ 
 
 

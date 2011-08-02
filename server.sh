@@ -38,7 +38,7 @@ VERSION="Version: 0.2.5-Beta"
 GELB="\033[1;33m"
 ROT="\033[0;31m"
 FARBLOS="\033[0m"
-# ---
+
 
 # STARTUP_LOCK AUF 0 SETZEN
 STARTUP_LOCK="0"
@@ -47,15 +47,13 @@ STARTUP_LOCK="0"
 cd $(dirname $0)
 
 
- clear
+  clear
 # CONFIGCHECK
 if [ -r "server.conf" ]; then
   source server.conf
 else
   echo -e $ROT"Error:$FARBLOS Configdatei fehlt oder Pfad ist falsch."
-  # STARTUP_LOCK SETZEN
-  STARTUP_LOCK="$[$STARTUP_LOCK+1]"
-  echo ""
+  exit
 fi
 
 # ADMINCHECK
@@ -167,19 +165,28 @@ fi
 
 # --- PARAMETERZUSAETZE --- #
 
-# FARBUNTERDRUECKUNG
-if [[ `echo $* |grep "\--nocolors" ` ]]; then
+START_PARAMS='\--nocolors$|\-c$'
+
+# PARAMETER NACH FUNKTION
+if [[ `echo $* |grep -E "$START_PARAMS" ` ]]; then
   GELB=""
   ROT=""
   FARBLOS=""
+fi
+
+# PARAMETER VOR FUNKTION
+if [[ "$(echo $1 |grep -E "$START_PARAMS")" ]]; then
+  GELB=""
+  ROT=""
+  FARBLOS=""
+  shift
 fi
 
 # ----
  
 # START - BEGINN DES SCRIPTES
 # ---------------------------------------------------------------------------------------------
- case "$1" in
-start|1)
+function SERVER_SH_START {
 # GAMECHECK
 if [ ! -d "$DIR/$SRCDSDIR" ]; then
   echo -e $ROT"Error:$FARBLOS Srcdsdir '$SRCDSDIR' existiert nicht."
@@ -261,14 +268,14 @@ if [ -f "$DIR/extensions/advert_extension.sh" ]; then
   $DIR/extensions/advert_extension.sh start
 fi
 
-;;
+}
 # ---------------------------------------------------------------------------------------------
 
 
 
 # STOP
 # ---------------------------------------------------------------------------------------------
-stop|2)
+function SERVER_SH_STOP {
 # CHECK OB SERVER LAEUFT
 if [[ `screen -ls |grep $SCREENNAME-running` ]]; then
   screen -dr $SCREENNAME-running -X quit 
@@ -290,27 +297,25 @@ if [ -f "$DIR/extensions/advert_extension.sh" ]; then
   chmod 755 $DIR/extensions/advert_extension.sh
   $DIR/extensions/advert_extension.sh stop
 fi
-;;
+}
 # ---------------------------------------------------------------------------------------------
 
 
 
 # RESTART
 # ---------------------------------------------------------------------------------------------
-restart|3)
-$0 stop
+function SERVER_SH_RESTART {
+SERVER_SH_STOP
 sleep 1
-$0 start
-;;
+SERVER_SH_START
+}
 # ---------------------------------------------------------------------------------------------
 
 
 
 # UPDATE
 # ---------------------------------------------------------------------------------------------
-update|install|4)
-# PRECONFIGURE_IN
-$0 preconfigure >/dev/null
+function SERVER_SH_UPDATE {
 
 # FALLS SERVER NOCH LAEUFT
 if [[ `screen -ls |grep $SCREENNAME-running` ]]; then
@@ -353,14 +358,17 @@ if [ "$UPDATE_SERVER_STAT" == "ON" ]; then
 else
   clear; echo -e $GELB"Das Update wurde im Screen $SCREENNAME-update gestartet."$FARBLOS
 fi
-;;
+
+# PRECONFIGURE_IN
+SERVER_SH_PRECONFIGURE >/dev/null
+}
 # ---------------------------------------------------------------------------------------------
 
 
 
 # STATUS
 # ---------------------------------------------------------------------------------------------
-status|5) 
+function SERVER_SH_STATUS {
 # FALLS KEIN SCREENNAMEN GEFUNDEN WURDE --- TESTING ---
 if [[ ! `screen -ls |grep $SCREENNAME-` ]]; then
   echo -e $GELB"Zurzeit werden auf diesem Server keine Aktivitaeten Ausgefuehrt."$FARBLOS
@@ -413,14 +421,14 @@ fi
 if [[ `screen -ls |grep $SCREENNAME-advert` ]]; then
   echo -e $GELB"Advert Daemon laeuft."$FARBLOS
 fi
-;;
+}
 # ---------------------------------------------------------------------------------------------
 
 
 
 # WATCH
 # ---------------------------------------------------------------------------------------------
-watch|6)
+function SERVER_SH_WATCH {
 if [[ `screen -ls |grep $SCREENNAME-running` ]]; then 
   echo "Sitzung wird geoeffnet (STRG+A+D zum Detachen." 
   echo .
@@ -434,14 +442,14 @@ if [[ `screen -ls |grep $SCREENNAME-running` ]]; then
 else 
   echo "Server $SCREENNAME laeuft nicht."
 fi
-;;
+}
 # ---------------------------------------------------------------------------------------------
 
 
 
 # WATCHUPDATE
 # ---------------------------------------------------------------------------------------------
-watchupdate|7)
+function SERVER_SH_WATCHUPDATE {
 if [[ `screen -ls |grep $SCREENNAME-update` ]]; then
   echo "Sitzung wird geoeffnet (STRG+A+D zum Detachen." 
   echo .
@@ -455,14 +463,14 @@ if [[ `screen -ls |grep $SCREENNAME-update` ]]; then
 else
   echo "Das Update $SCREENNAME-update ist entweder schon fertig, oder laeuft nicht."
 fi
-;;
+}
 # ---------------------------------------------------------------------------------------------
 
 
 
 # PING
 # ---------------------------------------------------------------------------------------------
-ping|8)
+function SERVER_SH_PING {
 echo "Bitte kurz warten der Server wird angepingt."
 sleep 0.5
 
@@ -470,14 +478,14 @@ if [ "`$QUAKESTAT -$QSTAT $IP:$PORT | grep -v ADDRESS | awk '{ print $2 }' | awk
   echo "Der Server ist nicht anpingbar somit Down oder er startet/updated noch."
   else echo "Der Server ist anpingbar und laueft."
 fi
-;;
+}
 # ---------------------------------------------------------------------------------------------
 
 
 
 # MAPLISTCREATE
 # ---------------------------------------------------------------------------------------------
-maplistcreate|9)
+function SERVER_SH_MAPLISTCREATE {
 
 # FALLS MAPLIST VORHANDEN
 if [ -f "$DIR/$SRCDSDIR/$GAMEMOD/maplist.txt" ]; then
@@ -513,14 +521,14 @@ else
 	fi
 	
 fi
-;;
+}
 # ---------------------------------------------------------------------------------------------
 
 
 
 # LISTGAMES
 # ---------------------------------------------------------------------------------------------
-listgames|10)
+function SERVER_SH_LISTGAMES {
 # CHECKEN OB STEAM VORHANDEN
 if [ ! -f "steam" ]; then
   echo "Das Hldsupdatetool bzw Steam ist nicht vorhanden, und wird nun herruntergeladen."
@@ -539,14 +547,14 @@ clear; echo "Die Spieleliste wurde von Steam bezogen, und in die Datei games_ava
 echo "Diese wird dir nun angezeigt."
 sleep 5
 cat $DIR/tmp/games_available.txt
-;;
+}
 # ---------------------------------------------------------------------------------------------
 
 
 
 # BACKUP
 # ---------------------------------------------------------------------------------------------
-backup|11)
+function SERVER_SH_BACKUP {
 # FALLS SERVER NOCH LAEUFT
 if [[ `screen -ls |grep $SCREENNAME-running` ]]; then
   BACKUP_SERVER_STAT="ON"
@@ -568,25 +576,44 @@ if [[ `screen -ls |grep $SCREENNAME-backup` ]]; then
 fi
 
 # CHECK OB ARCHIV BEREITS BESTEHT
-if [ -f "tmp/$SCREENNAME.`$DATE`.tar.gz" ]; then
+if [ -f "tmp/$SCREENNAME.`$DATE`.$BACKUP_FORMAT" ]; then
   echo -e $GELB"Ein Backuparchiv mit diesem Datum existiert bereits, bitte warten sie einen Augenblick"$FARBLOS
   exit
 fi
 
-screen -dmS $SCREENNAME-backup nice -n 19 tar cfvz  tmp/$SCREENNAME.`$DATE`.tar.gz $BACKUP_FILES 
+# BACKUPFORMAT
+# TAR
+if [ "$BACKUP_FORMAT" == "tar" ]; then
+  screen -dmS $SCREENNAME-backup nice -n 19 tar cfv tmp/$SCREENNAME.`$DATE`.tar $BACKUP_FILES
+# TAR.GZ
+elif [ "$BACKUP_FORMAT" == "tar.gz" ]; then
+  screen -dmS $SCREENNAME-backup nice -n 19 tar cfvz tmp/$SCREENNAME.`$DATE`.tar.gz $BACKUP_FILES
+# TAR.BZ2  
+elif [ "$BACKUP_FORMAT" == "tar.bz2" ]; then
+  screen -dmS $SCREENNAME-backup nice -n 19 tar cfvj tmp/$SCREENNAME.`$DATE`.tar.bz2 $BACKUP_FILES
+# FALLS NICHT ANGEGEBEN
+elif [ -z "$BACKUP_FORMAT" ]; then
+  echo -e $ROT"Error:$FARBLOS Backup Format nicht angegeben."
+  exit
+# FALLS FALSCH ANGEGEBEN
+else
+  echo -e $ROT"Error:$FARBLOS Falsches Backup-Format."
+  exit
+fi
+
 if [ "$BACKUP_SERVER_STAT" == "ON" ]; then
   clear; echo -e $GELB"Der Server $SCREENNAME wurde gestoppt, und das Backup wurde im Screen $SCREENNAME-backup gestartet."$FARBLOS
 else
   clear; echo -e $GELB"Das Backup wurde im Screen $SCREENNAME-backup gestartet."$FARBLOS
 fi
-;;
+}
 # ---------------------------------------------------------------------------------------------
 
 
 
 # PRECONFIGURE
 # ---------------------------------------------------------------------------------------------
-preconfigure|12)
+function SERVER_SH_PRECONFIGURE {
 
 # PRECONF ACTIVE CHECK
 if [ ! "$PRECONFIGURE" == "1" ]; then
@@ -665,14 +692,14 @@ if [ ! "$TEMPLATE_EXIST_LOCK" == "0" ]; then
 else
   echo -e $GELB"CFGS wurden in $DIR/$SRCDSDIR/$GAMEMOD/cfg angelegt."$FARBLOS
 fi
-;;
+}
 # ---------------------------------------------------------------------------------------------
 
 
 
 # UPDATEVERSION
 # ---------------------------------------------------------------------------------------------
-updateversion|13)
+function SERVER_SH_UPDATEVERSION {
 VERSIONCHECK_LOCAL="$VERSION" 
 VERSIONCHECK_REMOTE="`wget -q -O- $VERSIONURL | fgrep  Version:`"
 FEATURES="`wget -q -O- $FEATURESURL | grep -v '#'`"
@@ -780,26 +807,26 @@ else
   clear; echo -e $GELB"Update abgebrochen"$FARBLOS
   
 fi
-;;
+}
 # ---------------------------------------------------------------------------------------------
 
 
 
 # VERSION
 # ---------------------------------------------------------------------------------------------
-version|14)
+function SERVER_SH_VERSION {
 echo "Ihre Version:    $VERSION"
-;;
+}
 # ---------------------------------------------------------------------------------------------
 
 
 
 # ADDONISNTALL
 # ---------------------------------------------------------------------------------------------
-addoninstall|15)
+function SERVER_SH_ADDONINSTALL {
 
 # FALSCHEINGABE
-if [ "$2" == "" ]; then
+if [ "$1" == "" ]; then
   echo -e $ROT"Error:$FARBLOS Falscheingabe"
   echo "     Usage: addoninstall Addonname"
   exit
@@ -814,14 +841,14 @@ else
 fi
 
 # FALLS SCHON VORHANDEN
-if [ -f "$DIR/$SRCDSDIR/$GAMEMOD/$2.addonlist" ]; then
-  echo -ne $GELB"Das Addon '$2' scheint schon installiert zu sein.$FARBLOS
+if [ -f "$DIR/$SRCDSDIR/$GAMEMOD/$1.addonlist" ]; then
+  echo -ne $GELB"Das Addon '$1' scheint schon installiert zu sein.$FARBLOS
   [- wollen sie es dennoch installieren? yes/no: "
   read ADDON_OVERWRITE_QUESTION
   
   
     if [ ! "$ADDON_OVERWRITE_QUESTION" == "yes" ]; then
-      clear; echo -e $GELB"Das Addon '$2' Wurde nicht installiert"$FARBLOS
+      clear; echo -e $GELB"Das Addon '$1' Wurde nicht installiert"$FARBLOS
       exit
     fi
    
@@ -830,18 +857,18 @@ fi
 # DOWNLOAD DES ADDONS
 clear; echo -e $GELB"Einen Moment bitte."$FARBLOS
 
-if [[ `wget -q -O- $ADDONURL/$2.tar.bz2` ]]; then
-  clear; echo -e $GELB"Addon '$2' wird herruntergeladen"$FARBLOS
-  wget -q  $ADDONURL/$2.tar.bz2
-  else echo -e $ROT"Addon '$2.tar.bz2' ist nicht auf dem Masterserver vorhanden."$FARBLOS 
+if [[ `wget -q -O- $ADDONURL/$1.tar.bz2` ]]; then
+  clear; echo -e $GELB"Addon '$1' wird herruntergeladen"$FARBLOS
+  wget -q  $ADDONURL/$1.tar.bz2
+  else echo -e $ROT"Addon '$1.tar.bz2' ist nicht auf dem Masterserver vorhanden."$FARBLOS 
   exit
 fi
 # ---
 
 # VERARBEITUNG DES ADDONS
-if [ -f "$2.tar.bz2" ]; then
-  tar xfvj $2.tar.bz2 > addoninstall_$2.log
-  rm $2.tar.bz2
+if [ -f "$1.tar.bz2" ]; then
+  tar xfvj $1.tar.bz2 > addoninstall_$1.log
+  rm $1.tar.bz2
   
     # ADDONINSTALL FILE
     if [ -f "addoninstall.sh" ]; then
@@ -850,23 +877,23 @@ if [ -f "$2.tar.bz2" ]; then
 	  rm addoninstall.sh
 	fi
   
-  clear; echo -e $GELB"Das Addon '$2' wurde erfolgreich installiert."$FARBLOS
+  clear; echo -e $GELB"Das Addon '$1' wurde erfolgreich installiert."$FARBLOS
 	
 else
-  echo -e $GELB"Das Addon '$2.tar.bz2' existiert nicht!"$FARBLOS
+  echo -e $GELB"Das Addon '$1.tar.bz2' existiert nicht!"$FARBLOS
   exit
 fi
-;;
+}
 # ---------------------------------------------------------------------------------------------
 
 
 
 # ADDONREMOVE
 # ---------------------------------------------------------------------------------------------
-addonremove|16)
+function SERVER_SH_ADDONREMOVE {
 
 # FALSCHEINGABE
-if [ "$2" == "" ]; then
+if [ "$1" == "" ]; then
   echo -e $ROT"Error:$FARBLOS Falscheingabe"
   echo "     Usage: addonremove Addonname"
   exit
@@ -881,8 +908,8 @@ else
 fi
 
 # PRUFEN UND DEINSTALLIEREN DES ADDONS 
-if [ ! -f "$DIR/$SRCDSDIR/$GAMEMOD/$2.addonlist" ]; then
-  echo -e $GELB"Die Addondatei '$2.addonlist' existiert nicht!"$FARBLOS
+if [ ! -f "$DIR/$SRCDSDIR/$GAMEMOD/$1.addonlist" ]; then
+  echo -e $GELB"Die Addondatei '$1.addonlist' existiert nicht!"$FARBLOS
   exit
 fi
 
@@ -890,27 +917,27 @@ echo -e $GELB"Einen Moment bitte."$FARBLOS
 sleep 1
 
 # LOESCHFUNKTION
-cat $DIR/$SRCDSDIR/$GAMEMOD/$2.addonlist | tr -d '\r' | tr -s '\n' | while read ADDONLIST; do
+cat $DIR/$SRCDSDIR/$GAMEMOD/$1.addonlist | tr -d '\r' | tr -s '\n' | while read ADDONLIST; do
   rm -Rf $ADDONLIST
 done
 
-rm $DIR/$SRCDSDIR/$GAMEMOD/$2.addonlist
+rm $DIR/$SRCDSDIR/$GAMEMOD/$1.addonlist
 
 # FALLS INSTALLER LOG VORHANDEN
-if [ -f "addoninstall_$2.log" ]; then
- rm -f addoninstall_$2.log
+if [ -f "addoninstall_$1.log" ]; then
+ rm -f addoninstall_$1.log
 fi
 
 # ---
-clear; echo -e $GELB"Addon '$2' wurde geloescht"$FARBLOS
-;;
+clear; echo -e $GELB"Addon '$1' wurde geloescht"$FARBLOS
+}
 # ---------------------------------------------------------------------------------------------
 
 
 
 # ADDONLIST
 # ---------------------------------------------------------------------------------------------
-addonlist|17)
+function SERVER_SH_ADDONLIST {
 
 # ADDONLISTCHECK
 if [[ ! `wget -q -O- $ADDONURL/addons.txt` ]]; then
@@ -923,14 +950,14 @@ echo ""
 echo "---"
 echo "`wget -q -O- $ADDONURL/addons.txt`"
 echo "---"
-;;
+}
 # ---------------------------------------------------------------------------------------------
 
 
 
 # ADDONINSTALLED
 # ---------------------------------------------------------------------------------------------
-addons|addonlist_local|18)
+function SERVER_SH_ADDONS {
 
 # ORDNERCHECK
 if [ ! -d "$DIR/$SRCDSDIR/$GAMEMOD" ]; then
@@ -955,14 +982,14 @@ echo "---"
 echo "`cat $DIR/addonslist.tmp`"
 echo "---"
 rm $DIR/addonslist.tmp
-;;
+}
 # ---------------------------------------------------------------------------------------------
 
 
 
 # CLEANUP
 # ---------------------------------------------------------------------------------------------
-cleanup|19)
+function SERVER_SH_CLEANUP {
 
 # ZTMP
 # ---------------
@@ -1067,15 +1094,14 @@ sleep 2
 
 clear; echo -e $GELB"Server wurde aufgeraeumt."$FARBLOS
 echo "Es wurden: '$CLEANUP_ZTMP_COUNT' Ztmp Dateien, '$CLEANUP_LOG_COUNT' Logs, '$CLEANUP_DEMO_COUNT' SourceTv-Demos, '$CLEANUP_DOWNLOADS_LISTS_COUNT' DownloadLists, und '$CLEANUP_DOWNLOADS_COUNT' Downloads entfernt."
-;;
+}
 # ---------------------------------------------------------------------------------------------
 
 
 
 # CRONJOB
 # ---------------------------------------------------------------------------------------------
-cronjob|crontab|cron|20)
-clear
+function SERVER_SH_CRONTAB {
 echo "Geben sie bitte hier die Stunde und Minute des taeglichen Cronjobs ein."
 echo ""
 echo -n "Stunde des Cronjobs {0-23}: "
@@ -1126,7 +1152,7 @@ echo "Achten sie darauf mittels Enter eine leere Zeile folgend dem Befehl zu erz
 echo ""
 echo "# $CRONJOB_COMMENT $CRONJOB_HOUR:$CRONJOB_MINUTE Uhr
 $CRONJOB_MINUTE $CRONJOB_HOUR * * * $DIR/tmp/cron-$SCREENNAME-$CRONJOB_ACTION"
-;;
+}
 # ---------------------------------------------------------------------------------------------
 
 
@@ -1134,9 +1160,9 @@ $CRONJOB_MINUTE $CRONJOB_HOUR * * * $DIR/tmp/cron-$SCREENNAME-$CRONJOB_ACTION"
 
 # MAKEVDF
 # ---------------------------------------------------------------------------------------------
-makevdf|vdf|21)
+function SERVER_SH_MAKEVDF {
 
-case "$2" in
+case "$1" in
 # METAMOD
 mm|meta|metamod)
 if [ -d "$DIR/$SRCDSDIR/$GAMEMOD/addons/metamod" ]; then
@@ -1201,7 +1227,7 @@ echo -e "       Nutzung: sm|sourcemod - mm|metamod - mani|mani_admin"
 esac  
 exit
   
-;;
+}
 # ---------------------------------------------------------------------------------------------
 
 
@@ -1209,7 +1235,7 @@ exit
 
 # WATCHLOG
 # ---------------------------------------------------------------------------------------------
-watchlog|logwatch|log)
+function SERVER_SH_WATCHLOG {
 if [ -f "$DIR/$SRCDSDIR/screenlog.0" ]; then
   echo -e $GELB"--- Log beginnt ---"$FARBLOS
   more $DIR/$SRCDSDIR/screenlog.0
@@ -1217,7 +1243,7 @@ if [ -f "$DIR/$SRCDSDIR/screenlog.0" ]; then
 else
   echo "Kein Screenlog vorhanden."
 fi
-;;
+}
 # ---------------------------------------------------------------------------------------------
 
 
@@ -1225,7 +1251,7 @@ fi
 
 # HELP
 # ---------------------------------------------------------------------------------------------
-h|help|-h|--help|22)
+function SERVER_SH_HELP {
 clear
 echo "Ausfuehrbare Befehle"
 echo "Usage: $0 {Code/Befehl}"
@@ -1241,9 +1267,9 @@ echo "6)  watch                     - Oeffnet die Screensession des Gameservers.
 echo "7)  watchupdate               - Oeffnet die Screensession des Updaters."
 echo "8)  ping                      - Pingt den Server an und checkt ob er online ist."
 echo "9)  maplistcreate             - Erstellt eine maplist/mapcycle\.txt aller .bsp Dateien in standartgemaess srcdsdir/moddir/maps."
-echo "10) listgames                 - Listet alle Spiele auf die ueber Steam bezogen werden koennen und schreibt sie in tmp/games_avaible.txt"
-echo "11) backup                    - Backuppt den Gameserver in das Hauptverzeichnis mit Angabe des Datumsformates (siehe unten)."
-echo "12) preconfigure              - Laed eine Minimale Server/Autoexec\.cfg vom eingetragenen Masterserver nach standartgemaess srcdsdir/moddir/cfg erstellt."
+echo "10) listgames                 - Listet alle Spiele auf die ueber Steam bezogen werden koennen und schreibt sie in tmp/games_available.txt"
+echo "11) backup                    - Backuppt den Gameserver in das TMP-Verzeichnis mit Angabe des Datumsformates."
+echo "12) preconfigure              - Laed eine Minimale Server/Autoexec\.cfg vom eingetragenen Masterserver nach standartgemaess srcdsdir/moddir/cfg."
 echo "13) updateversion             - Prueft die Locale Scriptversion und vergleicht diese mit dem Updateserver"
 echo "                             [- falls eine neue Version vorhanden ist kann sie nach zustimmung geupdatet werden."
 echo "                             [- Die alte Version geht dabei nicht verloren."
@@ -1258,9 +1284,104 @@ echo "21) makevdf|vdf               - Erstellt .vdf Dateien fuer verschiedene Ad
 echo ""
 echo ""
 echo "22) help|h                    - Zeigt diese Hilfe an"
-;;
-# ---------------------------------------------------------------------------------------------
+echo ""
+echo ""
+echo "Command {--nocolors|-c}       - Unterdrueckt die Shellfarben."
+}
 
+
+case "$1" in
+start|1)
+SERVER_SH_START
+;;
+
+stop|2)
+SERVER_SH_STOP
+;;
+
+restart|3)
+SERVER_SH_RESTART
+;;
+
+update|install|4)
+SERVER_SH_UPDATE
+;;
+
+status|5) 
+SERVER_SH_STATUS
+;;
+
+watch|6)
+SERVER_SH_WATCH
+;;
+
+watchupdate|7)
+SERVER_SH_WATCHUPDATE
+;;
+
+ping|8)
+SERVER_SH_PING
+;;
+
+maplistcreate|9)
+SERVER_SH_MAPLISTCREATE
+;;
+
+listgames|10)
+SERVER_SH_LISTGAMES
+;;
+
+backup|11)
+SERVER_SH_BACKUP
+;;
+
+preconfigure|12)
+SERVER_SH_PRECONFIGURE
+;;
+
+updateversion|13)
+SERVER_SH_UPDATEVERSION
+;;
+
+version|14)
+SERVER_SH_VERSION
+;;
+
+addoninstall|15)
+SERVER_SH_ADDONINSTALL $2
+;;
+
+addonremove|16)
+SERVER_SH_ADDONREMOVE $2
+;;
+
+addonlist|17)
+SERVER_SH_ADDONLIST
+;;
+
+addons|addonlist_local|18)
+SERVER_SH_ADDONS
+;;
+
+cleanup|19)
+SERVER_SH_CLEANUP
+;;
+
+cronjob|crontab|cron|20)
+SERVER_SH_CRONTAB
+;;
+
+makevdf|vdf|21)
+SERVER_SH_MAKEVDF $2
+;;
+
+watchlog|logwatch|log)
+SERVER_SH_WATCHLOG
+;;
+
+h|help|-h|--help|22)
+SERVER_SH_HELP
+;;
 
 
 *)
