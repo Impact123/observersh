@@ -203,8 +203,8 @@ Server.sh CHANGELOG
  
  
  
-# xx.xx.2011
-# Version: 0.2.xx
+# 12.08.2011
+# Version: 0.2.5-Beta2
 - Grosses Update der README
 - Es wurde ein Bug in der addonremove Funktion behoben, wo es passieren kann, dass Leerzeichen in addon.addonlist Probleme während Entfernung verursachen. 
 - Ein Ordnercheck-Bug in Addoninstall wurde gefixt
@@ -220,6 +220,7 @@ Server.sh CHANGELOG
   - Mehrere Formate zur Auswahl (tar|tar.gz|tar.bz2).
 - Script wurde auf Functions umgestellt
 - Parameterzusaetze --nocolors und -c zugefuegt
+- Umstrukturierung der Config
 
  
 

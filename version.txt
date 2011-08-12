@@ -1,2 +1,2 @@
 # Version Script
-Version: 0.2.5-Beta
+Version: 0.2.5-Beta2
