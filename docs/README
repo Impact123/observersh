@@ -40,16 +40,17 @@ BESONDERHEITEN DES SCRIPTES
 		- Nuetzliche Extensions die den Umfang des Scriptes erweitern, entweder als pure Extension oder Standalone.
 	
 	- CleanupFunktion
-		- Entfernt den Gameserver von unnuetzen ballast wie:
+		- Entfernt den Gameserver von unnuetzen Ballast wie:
 			- SourceTv Demos
 			- Ztmp Dateien
-			- Alte Logs
-			- Alte Downloads
-			- Alte DownloadLists
+			- Alten Logs
+			- Alten Downloads
+			- Alten DownloadLists
+			- Alten Backupps
 		
 	- BackupFunktion
 		- Backuppt nur die essentiellen Dateien des Gameservers, damit nur der Platz beansprucht wird der gebraucht wird.
-		- Mehrere Formate
+		- Mehrere Formate.
 		
 	- PreconfigureFunktion
 		- Installiert vorgefertigte zumeist kommentierte Minimal Configs um die Arbeit zu ersparen.
@@ -266,6 +267,17 @@ Sometext -- FIXME
 	  -m           - ignore $STY variable, do create a new screen session.
 	  -S sockname  - Name this session <pid>.sockname instead of <pid>.<tty>.<host>.
 	  -L           - Turn on output logging.
+
+	  
+	  MAPLIST_EXCLUDES          - Wird durch folgende inputs deaktiviert: "0|disabled" 
+      MAPLIST_INCLUDE_ONLY      - Wird durch folgende inputs deaktiviert: "0|disabled" 
+	  PRECONFIGURE 	            - "0|1"
+	  PRECONFDEL                - "0|1"
+	  LOGTIME                   - "1-365"
+	  CRON_LOGGING              - "0|1"
+	  	  
+	  
+	  
 ----------------------------
 
 
@@ -275,31 +287,33 @@ Abschnitt: 3.4 - Erklaerung der Parameter
 --------------------------------------
 Folgende Parameter gibt es in der Config ein zu stellen.
 
-	Dir           - Kompletter Pfad zum Hauptordner des Servers zB /home/css/work (Geben sie bitte keinen Slash am Ende an).
-	Screenname    - Name des Screen Sockets unter welchem der Server spaeter laufen wird (Siehe oben).
-	Ip            - Mit dieser IP wird der Server gestartet.
-	Maxplayers    - Gibt die Anzahl der Slots aus.
-	Port          - Legt den Port fest mit welchem Der Server startet.
-	Screenoptions - Befehle mit welcher der Screen erstellt wird Siehe oben.
-	Map           - Map mit welcher der Server startet.
-	Extra         - Zusaetzliche Parameter zum eigentlichen Startbefehl.
-	Srcdsdir      - Pfad zur eigentlichen Binary ab $DIR, zb orangebox.
-	Logdir        - Pfad in welchem die Screenlogs zwischengelagert werden, ab $DIR.
-	Gamemod       - Name der Spielmodifikation.
-	Updatemod     - Kompletter Name des Spieles.
-	Qstat         - Kuerzel des Spieles das angepingt wird.
-	Date          - Gibt das Datumsformat an in welchen die Screenlogs und Maplisten Archiviert werden.
-	Logtime       - Zeit nach der Die Screenlogs Automatisch geloescht werden in Tagen.
-	Logexec       - Befehl der auf die Logs nach der Logtime angewandt wird.
-	Preconfigure  - Falls auf 1 gesetzt wird falls noch nicht vorhanden, eine Minimale Server/Autoexec\.cfg erstellt.
-	Preconfdel    - Falls auf 1 gesetzt werden falls vorhanden, Die Server/Autoexec\.cfg gebackuppt und neue erstellt.
-	Quakestat     - Auf nicht Debian Systemen unterscheiden sich die Qstat Binarys namentlich, falls kein Debian im Einsatz ist muss diese Variable moeglicherweise angepasst werden. 
-	Backup_files  - Die Dateien des Gameservers welche gebackuppt werden (Siehe Abschnitt 2.).
-	Backup_format - Format mit welchen die Backupps erstellt werden, (tar|tar.gz|tar.bz2)
-	Addonurl      - URL von welcher Addons fuer den Installer bezogen werden.
-	Cron_logging  - Hiermit wird beeinflusst ob Cronjobs Logfiles erstellen.
-	Templatesurl  - URL von welcher Templates bezogen werden.
---------------------------------------
+	Dir                   - Kompletter Pfad zum Hauptordner des Servers zB /home/css/work (Geben sie bitte keinen Slash am Ende an).
+	Screenname            - Name des Screen Sockets unter welchem der Server spaeter laufen wird (Siehe oben).
+	Ip                    - Mit dieser IP wird der Server gestartet.
+	Maxplayers            - Gibt die Anzahl der Slots aus.
+	Port                  - Legt den Port fest mit welchem Der Server startet.
+	Screenoptions         - Befehle mit welcher der Screen erstellt wird Siehe oben.
+	Map                   - Map mit welcher der Server startet.
+	Extra                 - Zusaetzliche Parameter zum eigentlichen Startbefehl.
+	Srcdsdir              - Pfad zur eigentlichen Binary ab $DIR, zb orangebox.
+	Logdir                - Pfad in welchem die Screenlogs zwischengelagert werden, ab $DIR.
+	Gamemod               - Name der Spielmodifikation.
+	Updatemod             - Kompletter Name des Spieles.
+	Qstat                 - Kuerzel des Spieles das angepingt wird.
+	Date                  - Gibt das Datumsformat an in welchen die Screenlogs und Maplisten Archiviert werden.
+	Logtime               - Zeit nach der Die Screenlogs Automatisch geloescht werden in Tagen.
+	Logexec               - Befehl der auf die Logs nach der Logtime angewandt wird.
+	Preconfigure          - Falls auf 1 gesetzt wird falls noch nicht vorhanden, eine Minimale Server/Autoexec\.cfg erstellt.
+	Preconfdel            - Falls auf 1 gesetzt werden falls vorhanden, Die Server/Autoexec\.cfg gebackuppt und neue erstellt.
+	Quakestat             - Auf nicht Debian Systemen unterscheiden sich die Qstat Binarys namentlich, falls kein Debian im Einsatz ist muss diese Variable moeglicherweise angepasst werden. 
+	Backup_files          - Die Dateien des Gameservers welche gebackuppt werden (Siehe Abschnitt 2.).
+	Backup_format         - Format mit welchen die Backupps erstellt werden, (tar|tar.gz|tar.bz2)
+	Addonurl              - URL von welcher Addons fuer den Installer bezogen werden.
+	Cron_logging          - Hiermit wird beeinflusst ob Cronjobs Logfiles erstellen.
+	Templatesurl          - URL von welcher Templates bezogen werden.
+	Maplist_excludes      - Excludiert angegebe Maps (Auch mit Jokern) aus der Maplist/Mapcycle-Datei. Wird durch folgende inputs deaktiviert: "0|disabled" --- Beispiel: MAPLIST_EXCLUDES="test_*|meinemap|de_*"
+	Maplist_include_only  - Includiert nur folgende Maps (Auch mit Jokern) in die Maplist/Mapcycle-Datei, und schliesst excludes aus. Wird durch folgende inputs deaktiviert: "0|disabled" --- Beispiel: MAPLIST_INCLUDE_ONLY="ba_*|fy_*"
+--------------------------------------. 
 
 
 

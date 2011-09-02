@@ -471,7 +471,7 @@ fi
 # PING
 # ---------------------------------------------------------------------------------------------
 function SERVER_SH_PING {
-echo "Bitte kurz warten der Server wird angepingt."
+echo "Bitte kurz warten, der Server wird angepingt."
 sleep 0.5
 
 if [ "`$QUAKESTAT -$QSTAT $IP:$PORT | grep -v ADDRESS | awk '{ print $2 }' | awk -F/ ' { print $1}'`" = "DOWN" ]; then
@@ -501,26 +501,39 @@ if [ -f "$DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt" ]; then
   MAPLIST_CFG_EXIST="1"
 fi
 
+# FALLS MAPORDNER NICHT EXISTIERT
 if [ ! -d "$DIR/$SRCDSDIR/$GAMEMOD/maps" ]; then
   echo "Ordner Maps ist nicht vorhanden."
   exit
-else
-  cd $DIR/$SRCDSDIR/$GAMEMOD/maps
-  echo "// Maplist.txt created by GuGy.eu Server.sh $VERSION" > $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
-  echo "// Mapcycle.txt created by GuGy.eu Server.sh $VERSION" > $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
-  echo "" >> $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
-  echo "" >> $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
+fi
 
-  ls *.bsp |awk -F '.' '{print $1}' |sort |grep -v 'test_*' >> $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
-  ls *.bsp |awk -F '.' '{print $1}' |sort |grep -v 'test_*' >> $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
+cd $DIR/$SRCDSDIR/$GAMEMOD/maps
+echo "// Maplist.txt created by GuGy.eu Server.sh $VERSION" > $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
+echo "// Mapcycle.txt created by GuGy.eu Server.sh $VERSION" > $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
+echo "" >> $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
+echo "" >> $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
+
+# FALLS MAPLIST_INCLUDE_ONLY LEER ODER DISABLED
+if [ -z "$MAPLIST_INCLUDE_ONLY" ] || [ "$MAPLIST_INCLUDE_ONLY" == "0" ] || [ "$MAPLIST_INCLUDE_ONLY" == "disabled" ]; then
+# FALLS MAPLIST_EXCLUDES NICHT LEER
+if ! [ -z "$MAPLIST_EXCLUDES" ] || [ "$MAPLIST_EXCLUDES" == "0" ] || [ "$MAPLIST_EXCLUDES" == "disabled" ]; then
+  ls *.bsp |awk -F '.' '{print $1}' |sort |grep -Evi "$MAPLIST_EXCLUDES" >> $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
+  ls *.bsp |awk -F '.' '{print $1}' |sort |grep -Evi "$MAPLIST_EXCLUDES" >> $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
+else
+  ls *.bsp |awk -F '.' '{print $1}' |sort >> $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
+  ls *.bsp |awk -F '.' '{print $1}' |sort >> $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
+fi
+# MAPLIST_INCLUDE_ONLY ELSE
+else
+  ls *.bsp |awk -F '.' '{print $1}' |sort |grep -Ei "$MAPLIST_INCLUDE_ONLY" >> $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
+  ls *.bsp |awk -F '.' '{print $1}' |sort |grep -Ei "$MAPLIST_INCLUDE_ONLY" >> $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
+fi
 
     if [ "$MAPLIST_CFG_EXIST" == "1" ]; then
       echo -e $GELB"Mapliste und Mapcycle wurden erstellt, und die alten nach Datum gebackuppt."$FARBLOS
 	else
 	  echo -e $GELB"Mapliste und Mapcycle wurden erstellt."$FARBLOS
 	fi
-	
-fi
 }
 # ---------------------------------------------------------------------------------------------
 
@@ -778,7 +791,7 @@ if [ "$UPDATEQUESTION" == "yes" ]; then
 # ---
 # SERVER.SH BACKUPPEN
 if [ -f "server.sh" ]; then
-  cp server.sh  server.sh_`$DATE`
+  mv server.sh  server.sh_`$DATE`
   mv server.sh_* $DIR/tmp
 fi
 
@@ -796,10 +809,10 @@ if [ -f "$DIR/server.conf" ]; then
  # CONFIGMOVE IF EXIST
  # FIXME
   tar xvf server.tar.gz --exclude server.conf --exclude make
-  rm server.tar.gz
+  rm -f server.tar.gz
 else
   tar xvf server.tar.gz --exclude make
-  rm server.tar.gz
+  rm -f server.tar.gz
 fi
 
   clear; echo -e $GELB"Update war erfolgreich"$FARBLOS
@@ -868,13 +881,13 @@ fi
 # VERARBEITUNG DES ADDONS
 if [ -f "$1.tar.bz2" ]; then
   tar xfvj $1.tar.bz2 > addoninstall_$1.log
-  rm $1.tar.bz2
+  rm -f $1.tar.bz2
   
     # ADDONINSTALL FILE
     if [ -f "addoninstall.sh" ]; then
 	  chmod 755 addoninstall.sh
 	  ./addoninstall.sh
-	  rm addoninstall.sh
+	  rm -f addoninstall.sh
 	fi
   
   clear; echo -e $GELB"Das Addon '$1' wurde erfolgreich installiert."$FARBLOS
@@ -921,7 +934,7 @@ cat $DIR/$SRCDSDIR/$GAMEMOD/$1.addonlist | tr -d '\r' | tr -s '\n' | while read 
   rm -Rf $ADDONLIST
 done
 
-rm $DIR/$SRCDSDIR/$GAMEMOD/$1.addonlist
+rm -f $DIR/$SRCDSDIR/$GAMEMOD/$1.addonlist
 
 # FALLS INSTALLER LOG VORHANDEN
 if [ -f "addoninstall_$1.log" ]; then
@@ -981,7 +994,7 @@ echo ""
 echo "---"
 echo "`cat $DIR/addonslist.tmp`"
 echo "---"
-rm $DIR/addonslist.tmp
+rm -f $DIR/addonslist.tmp
 }
 # ---------------------------------------------------------------------------------------------
 
@@ -1005,7 +1018,7 @@ if [ -f "$DIR/tmp/cleanup_ztmp_count.tmp" ]; then
 else
   ZTMP_COUNT="Error beim lesen der Datei."
 fi
-sleep 2
+sleep 1
 # ---------------
 
 
@@ -1015,8 +1028,8 @@ echo "Loesche alte Log Dateien..."
 # COUNT FILES
 # CHECK OB ORDNER VORHANDEN DOWNLOADS
 if [ -d "$DIR/$SRCDSDIR/$GAMEMOD/logs" ]; then
-find $DIR/$SRCDSDIR/$GAMEMOD/logs/ -type f -name "*.log" -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_log_count.tmp
-find $DIR/$SRCDSDIR/$GAMEMOD/logs/ -type f -name "*.log" -mtime +$LOGTIME $LOGEXEC
+find $DIR/$SRCDSDIR/$GAMEMOD/ -type f -name "*.log" -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_log_count.tmp
+find $DIR/$SRCDSDIR/$GAMEMOD/ -type f -name "*.log" -mtime +$LOGTIME $LOGEXEC
 fi
 
 
@@ -1027,7 +1040,7 @@ if [ -f "$DIR/tmp/cleanup_log_count.tmp" ]; then
 else
   CLEANUP_LOG_COUNT="Error beim lesen der Datei."
 fi
-sleep 2
+sleep 1
 # ---------------
 
 
@@ -1049,7 +1062,7 @@ if [ -f "$DIR/tmp/cleanup_downloads_count.tmp" ]; then
 else
   CLEANUP_DOWNLOADS_COUNT="Error beim lesen der Datei."
 fi
-sleep 2
+sleep 1
 # ---------------
 
 
@@ -1071,7 +1084,7 @@ if [ -f "$DIR/tmp/cleanup_downloads_lists_count.tmp" ]; then
 else
   CLEANUP_DOWNLOADS_LISTS_COUNT="Error beim lesen der Datei."
 fi
-sleep 2
+sleep 1
 # ---------------
 
 
@@ -1089,13 +1102,41 @@ if [ -f "$DIR/tmp/cleanup_demo_count.tmp" ]; then
 else
   CLEANUP_DEMO_COUNT="Error beim lesen der Datei."
 fi
-sleep 2
+sleep 1
+# ---------------
+
+
+# BACKUPS
+# ---------------
+echo "Loesche alte Backup Dateien..."
+# COUNT FILES
+find $DIR/tmp/ -type f -name "*.tar*" -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_backup_count.tmp
+find $DIR/tmp/ -type f -name "*.tar*" -mtime +$LOGTIME $LOGEXEC
+
+# AMOUNT OF REMOVED FILES
+if [ -f "$DIR/tmp/cleanup_backup_count.tmp" ]; then
+  CLEANUP_BACKUP_COUNT="`cat $DIR/tmp/cleanup_backup_count.tmp`"
+  rm -f $DIR/tmp/cleanup_backup_count.tmp
+else
+  CLEANUP_BACKUP_COUNT="Error beim lesen der Datei."
+fi
+sleep 1
 # ---------------
 
 clear; echo -e $GELB"Server wurde aufgeraeumt."$FARBLOS
-echo "Es wurden: '$CLEANUP_ZTMP_COUNT' Ztmp Dateien, '$CLEANUP_LOG_COUNT' Logs, '$CLEANUP_DEMO_COUNT' SourceTv-Demos, '$CLEANUP_DOWNLOADS_LISTS_COUNT' DownloadLists, und '$CLEANUP_DOWNLOADS_COUNT' Downloads entfernt."
+
+echo ""
+echo "ZTMP:         '$CLEANUP_ZTMP_COUNT'"
+echo "LOG:          '$CLEANUP_LOG_COUNT'"
+echo "DOWNLOAD      '$CLEANUP_DOWNLOADS_COUNT'"
+echo "DOWNLOADLIST: '$CLEANUP_DOWNLOADS_LISTS_COUNT'"
+echo "SOURCETV:     '$CLEANUP_DEMO_COUNT'"
+echo "BACKUP        '$CLEANUP_BACKUP_COUNT'"
+
+
 }
 # ---------------------------------------------------------------------------------------------
+
 
 
 
@@ -1164,6 +1205,7 @@ function SERVER_SH_MAKEVDF {
 
 case "$1" in
 # METAMOD
+# ---------------------------------------------------
 mm|meta|metamod)
 if [ -d "$DIR/$SRCDSDIR/$GAMEMOD/addons/metamod" ]; then
   echo "\"Plugin\"

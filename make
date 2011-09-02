@@ -2,9 +2,20 @@
 # Makefile for Server.sh Releases
 clear
 
-RELEASE="server-$(cat version.txt |grep 'Version:' |awk {'print $2'}).tar.gz"
-FILES="server.sh server.conf docs version.txt make"
+FILES="server.sh server.conf version.txt make docs/CHANGELOG docs/LICENSE docs/README"
 
-chmod 700 server.sh
-tar cfvz $RELEASE $FILES
+for i in $FILES; do
+  if ! [ -f "$i" ]; then
+    echo "Error: Missing '$i'"
+	LOCK="1"
+  fi
+done
+
+[ $LOCK == "1" ] && exit 0
+
+RELEASE="server-$(cat version.txt |grep 'Version:' |awk {'print $2'}).tar.gz"
+
+chmod 600 server.conf version.txt docs/CHANGELOG docs/LICENSE docs/README
+chmod 700 server.sh make
+tar cfz $RELEASE $FILES
 clear; echo "Release $RELEASE gepackt."

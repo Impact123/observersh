@@ -196,8 +196,8 @@ Server.sh CHANGELOG
  - Check Falls Features nicht abrufbar
  - Check falls Contentserver nicht erreichbar
  - Check falls Version nicht abrufbar
- - Check falls neue Config benoetigt eird
- - Falls neue Config benoetigt wird die Config gebackuppt
+ - Check falls neue Config benoetigt wird
+ - Falls neue Config benoetigt wird, wird die Config gebackuppt
  - Fehleranzeige
 
  
@@ -222,6 +222,31 @@ Server.sh CHANGELOG
 - Parameterzusaetze --nocolors und -c zugefuegt
 - Umstrukturierung der Config
 
+
+
+
+# xx.xx.2011
+# Version: 0.2.x
+- Maplistcreate:
+  - MAPLIST_EXCLUDES zur Config zugefuegt
+  - Maplistexcludes eingebaut
+  - MAPLIST_INCLUDE_ONLY zur Config zugefuegt
+  - Maplistincludes eingebaut
+  
+- Cleanup:
+  - Logs werden nun auf dem ganzen Gameserver gesucht
+  - Backupps werden nun auch geloescht
+  - Zeit zwischen Aktionen verkuertzt
+  - Auflisting uebersichtlicher gestaltet
  
+ - Make:
+  - Make euberprueft nun ob alle Dateien vorhanden sind, und speichert nur diese
+  
+ - Updateversion:
+  - Bug beim updaten der Scriptdatei behoben
+  
+- Main:
+ - RM wird nun geforced
+  
 
 
