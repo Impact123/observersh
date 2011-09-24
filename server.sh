@@ -165,24 +165,40 @@ fi
 
 # --- PARAMETERZUSAETZE --- #
 
-START_PARAMS='\--nocolors$|\-c$'
+COLOR_PARAMS='\--nocolors$|\-c$'
 
 # PARAMETER NACH FUNKTION
-if [[ `echo $* |grep -E "$START_PARAMS" ` ]]; then
+if [[ `echo $* |grep -E "$COLOR_PARAMS" ` ]]; then
   GELB=""
   ROT=""
   FARBLOS=""
 fi
 
 # PARAMETER VOR FUNKTION
-if [[ "$(echo $1 |grep -E "$START_PARAMS")" ]]; then
+if [[ "$(echo $1 |grep -E "$COLOR_PARAMS")" ]]; then
   GELB=""
   ROT=""
   FARBLOS=""
   shift
 fi
 
-# ----
+# --- 
+
+FORCE_PARAMS='\--force$|\-f$'
+
+# PARAMETER NACH FUNKTION
+if [[ `echo $* |grep -E "$FORCE_PARAMS" ` ]]; then
+  FORCE_ACTIONS="1"
+fi
+
+# PARAMETER VOR FUNKTION
+if [[ "$(echo $1 |grep -E "$FORCE_PARAMS")" ]]; then
+  FORCE_ACTIONS="1"
+  shift
+fi
+
+# --- PARAMETERZUSAETZE --- #
+ 
  
 # START - BEGINN DES SCRIPTES
 # ---------------------------------------------------------------------------------------------
@@ -316,6 +332,35 @@ SERVER_SH_START
 # UPDATE
 # ---------------------------------------------------------------------------------------------
 function SERVER_SH_UPDATE {
+
+# FALLS FORCE
+if [ "$FORCE_ACTIONS" == "1" ]; then
+  CHECK_BEFORE_SHUTDOWN="0"
+fi
+
+# WENN CHECK AKTIVIERT
+if [ "$CHECK_BEFORE_SHUTDOWN" == "1" ] || [ "$CHECK_BEFORE_SHUTDOWN" == "on" ]; then
+
+  # FALLS SERVER ANPINGBAR
+  if [ ! "`$QUAKESTAT -$QSTAT $IP:$PORT | grep -v ADDRESS | awk '{ print $2 }' | awk -F/ ' { print $1}'`" == "DOWN" ]; then
+
+  # FALLS UNTER 10 SPIELER
+    if [[ ! "$($QUAKESTAT -$QSTAT $IP:$PORT |grep -v 'ADDRESS' |awk '{print $2}' |awk -F '/' '{print $2}')" == "$MAXPLAYERS" ]]; then
+      PLAYERS_ONLINE="`$QUAKESTAT -$QSTAT $IP:$PORT |grep -v 'ADDRESS' |awk  '{print $2,$3}' |tr -d ' ' |awk -F '/' {'print $1'}`"
+    else
+      PLAYERS_ONLINE="`$QUAKESTAT -$QSTAT $IP:$PORT |grep -v 'ADDRESS' |awk  '{print $2}' |awk -F '/' {'print $1'}`"
+    fi
+	
+	# FALLS SPIELERZAHL UEBER NULL
+	if [ ! "$PLAYERS_ONLINE" == "0" ]; then
+      clear; echo -e $GELB"Es sind '$PLAYERS_ONLINE' Spieler auf dem Server, Update wird nicht fortgesetzt."$FARBLOS
+	  exit
+	fi
+	
+  fi
+  
+fi
+
 
 # FALLS SERVER NOCH LAEUFT
 if [[ `screen -ls |grep $SCREENNAME-running` ]]; then
@@ -568,6 +613,36 @@ cat $DIR/tmp/games_available.txt
 # BACKUP
 # ---------------------------------------------------------------------------------------------
 function SERVER_SH_BACKUP {
+
+# FALLS FORCE
+if [ "$FORCE_ACTIONS" == "1" ]; then
+  CHECK_BEFORE_SHUTDOWN="0"
+fi
+
+# WENN CHECK AKTIVIERT
+if [ "$CHECK_BEFORE_SHUTDOWN" == "1" ] || [ "$CHECK_BEFORE_SHUTDOWN" == "on" ]; then
+
+  # FALLS SERVER ANPINGBAR
+  if [ ! "`$QUAKESTAT -$QSTAT $IP:$PORT | grep -v ADDRESS | awk '{ print $2 }' | awk -F/ ' { print $1}'`" == "DOWN" ]; then
+
+  # FALLS UNTER 10 SPIELER
+    if [[ ! "$($QUAKESTAT -$QSTAT $IP:$PORT |grep -v 'ADDRESS' |awk '{print $2}' |awk -F '/' '{print $2}')" == "$MAXPLAYERS" ]]; then
+      PLAYERS_ONLINE="`$QUAKESTAT -$QSTAT $IP:$PORT |grep -v 'ADDRESS' |awk  '{print $2,$3}' |tr -d ' ' |awk -F '/' {'print $1'}`"
+    else
+      PLAYERS_ONLINE="`$QUAKESTAT -$QSTAT $IP:$PORT |grep -v 'ADDRESS' |awk  '{print $2}' |awk -F '/' {'print $1'}`"
+    fi
+	
+	# FALLS SPIELERZAHL UEBER NULL
+	if [ ! "$PLAYERS_ONLINE" == "0" ]; then
+      clear; echo -e $GELB"Es sind '$PLAYERS_ONLINE' Spieler auf dem Server, Update wird nicht fortgesetzt."$FARBLOS
+	  exit
+	fi
+	
+  fi
+  
+fi
+
+
 # FALLS SERVER NOCH LAEUFT
 if [[ `screen -ls |grep $SCREENNAME-running` ]]; then
   BACKUP_SERVER_STAT="ON"
@@ -1006,121 +1081,149 @@ function SERVER_SH_CLEANUP {
 
 # ZTMP
 # ---------------
-echo "Loesche alte Ztmp Dateien..."
-# COUNT FILES
-find $DIR/$SRCDSDIR/$GAMEMOD/ -name "*.ztmp" -mtime $LOGTIME | wc -l > $DIR/tmp/cleanup_ztmp_count.tmp
-find $DIR/$SRCDSDIR/$GAMEMOD/ -name "*.ztmp" -mtime $LOGTIME $LOGEXEC
+# CHECK OB AKTIVIERT
+if [ "$CLEANUP_ZTMP" == "1" ] || [ "$CLEANUP_ZTMP" == "on" ]; then
+  echo "Loesche alte Ztmp Dateien..."
+  # COUNT FILES
+  find $DIR/$SRCDSDIR/$GAMEMOD/ -name "*.ztmp" -mtime $LOGTIME | wc -l > $DIR/tmp/cleanup_ztmp_count.tmp
+  find $DIR/$SRCDSDIR/$GAMEMOD/ -name "*.ztmp" -mtime $LOGTIME $LOGEXEC
 
-# AMOUNT OF REMOVED FILES
-if [ -f "$DIR/tmp/cleanup_ztmp_count.tmp" ]; then
-  CLEANUP_ZTMP_COUNT="`cat $DIR/tmp/cleanup_ztmp_count.tmp`"
-  rm -f $DIR/tmp/cleanup_ztmp_count.tmp
+  # AMOUNT OF REMOVED FILES
+  if [ -f "$DIR/tmp/cleanup_ztmp_count.tmp" ]; then
+    CLEANUP_ZTMP_COUNT="`cat $DIR/tmp/cleanup_ztmp_count.tmp`"
+    rm -f $DIR/tmp/cleanup_ztmp_count.tmp
+  else
+    CLEANUP_ZTMP_COUNT="Error beim lesen der Datei."
+  fi
+  sleep 1
 else
-  ZTMP_COUNT="Error beim lesen der Datei."
+  CLEANUP_ZTMP_COUNT="Deaktiviert"
 fi
-sleep 1
+      
 # ---------------
 
 
 # LOGS
 # ---------------
-echo "Loesche alte Log Dateien..."
-# COUNT FILES
-# CHECK OB ORDNER VORHANDEN DOWNLOADS
-if [ -d "$DIR/$SRCDSDIR/$GAMEMOD/logs" ]; then
-find $DIR/$SRCDSDIR/$GAMEMOD/ -type f -name "*.log" -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_log_count.tmp
-find $DIR/$SRCDSDIR/$GAMEMOD/ -type f -name "*.log" -mtime +$LOGTIME $LOGEXEC
-fi
+# CHECK OB AKTIVIERT
+if [ "$CLEANUP_LOGS" == "1" ] || [ "$CLEANUP_LOGS" == "on" ]; then
+  echo "Loesche alte Log Dateien..."
+  # COUNT FILES
+  # CHECK OB ORDNER VORHANDEN LOGS
+  #if [ -d "$DIR/$SRCDSDIR/$GAMEMOD/logs" ]; then
+    find $DIR/$SRCDSDIR/$GAMEMOD/ -type f -name "*.log" -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_log_count.tmp
+    find $DIR/$SRCDSDIR/$GAMEMOD/ -type f -name "*.log" -mtime +$LOGTIME $LOGEXEC
+  #fi
 
 
-# AMOUNT OF REMOVED FILES
-if [ -f "$DIR/tmp/cleanup_log_count.tmp" ]; then
-  CLEANUP_LOG_COUNT="`cat $DIR/tmp/cleanup_log_count.tmp`"
-  rm -f $DIR/tmp/cleanup_log_count.tmp
+  # AMOUNT OF REMOVED FILES
+  if [ -f "$DIR/tmp/cleanup_log_count.tmp" ]; then
+    CLEANUP_LOG_COUNT="`cat $DIR/tmp/cleanup_log_count.tmp`"
+    rm -f $DIR/tmp/cleanup_log_count.tmp
+  else
+   CLEANUP_LOG_COUNT="Error beim lesen der Datei."
+  fi
+  sleep 1
 else
-  CLEANUP_LOG_COUNT="Error beim lesen der Datei."
+  CLEANUP_LOG_COUNT="Deaktiviert"
 fi
-sleep 1
 # ---------------
 
 
 # DOWNLOADS
 # ---------------
-echo "Loesche alte Download Dateien..."
-# COUNT FILES
-# CHECK OB ORDNER VORHANDEN DOWNLOADS
-if [ -d "$DIR/$SRCDSDIR/$GAMEMOD/downloads" ]; then
-  find $DIR/$SRCDSDIR/$GAMEMOD/downloads/ -type f -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_downloads_count.tmp
-  find $DIR/$SRCDSDIR/$GAMEMOD/downloads/ -type f -mtime +$LOGTIME $LOGEXEC
-fi
+# CHECK OB AKTIVIERT
+if [ "$CLEANUP_DOWNLOADS" == "1" ] || [ "$CLEANUP_DOWNLOADS" == "on" ]; then
+  echo "Loesche alte Download Dateien..."
+  # COUNT FILES
+    find $DIR/$SRCDSDIR/$GAMEMOD/downloads/ -type f -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_downloads_count.tmp
+    find $DIR/$SRCDSDIR/$GAMEMOD/downloads/ -type f -mtime +$LOGTIME $LOGEXEC
 
 
-# AMOUNT OF REMOVED FILES
-if [ -f "$DIR/tmp/cleanup_downloads_count.tmp" ]; then
-  CLEANUP_DOWNLOADS_COUNT="`cat $DIR/tmp/cleanup_downloads_count.tmp`"
-  rm -f $DIR/tmp/cleanup_downloads_count.tmp
+  # AMOUNT OF REMOVED FILES
+  if [ -f "$DIR/tmp/cleanup_downloads_count.tmp" ]; then
+    CLEANUP_DOWNLOADS_COUNT="`cat $DIR/tmp/cleanup_downloads_count.tmp`"
+    rm -f $DIR/tmp/cleanup_downloads_count.tmp
+  else
+    CLEANUP_DOWNLOADS_COUNT="Error beim lesen der Datei."
+  fi
+  sleep 1
 else
-  CLEANUP_DOWNLOADS_COUNT="Error beim lesen der Datei."
+  CLEANUP_DOWNLOADS_COUNT="Deaktiviert"
 fi
-sleep 1
 # ---------------
 
 
 # DOWNLOADS LISTS
 # ---------------
-echo "Loesche alte DownloadLists..."
-# COUNT FILES
-# CHECK OB ORDNER VORHANDEN DOWNLOADS
-if [ -d "$DIR/$SRCDSDIR/$GAMEMOD/DownloadLists" ]; then
-  find $DIR/$SRCDSDIR/$GAMEMOD/DownloadLists/ -type f -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_downloads_lists_count.tmp
-  find $DIR/$SRCDSDIR/$GAMEMOD/DownloadLists/ -type f -mtime +$LOGTIME $LOGEXEC
-fi
+# CHECK OB AKTIVIERT
+if [ "$CLEANUP_DOWNLOADLISTS" == "1" ] || [ "$CLEANUP_DOWNLOADLISTS" == "on" ]; then
+  echo "Loesche alte DownloadLists..."
+  # COUNT FILES
+  # CHECK OB ORDNER VORHANDEN DOWNLOADLISTS
+  if [ -d "$DIR/$SRCDSDIR/$GAMEMOD/DownloadLists" ]; then
+    find $DIR/$SRCDSDIR/$GAMEMOD/DownloadLists/ -type f -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_downloads_lists_count.tmp
+    find $DIR/$SRCDSDIR/$GAMEMOD/DownloadLists/ -type f -mtime +$LOGTIME $LOGEXEC
+  fi
 
 
-# AMOUNT OF REMOVED FILES
-if [ -f "$DIR/tmp/cleanup_downloads_lists_count.tmp" ]; then
-  CLEANUP_DOWNLOADS_LISTS_COUNT="`cat $DIR/tmp/cleanup_downloads_lists_count.tmp`"
-  rm -f $DIR/tmp/cleanup_downloads_lists_count.tmp
+  # AMOUNT OF REMOVED FILES
+  if [ -f "$DIR/tmp/cleanup_downloads_lists_count.tmp" ]; then
+    CLEANUP_DOWNLOADS_LISTS_COUNT="`cat $DIR/tmp/cleanup_downloads_lists_count.tmp`"
+    rm -f $DIR/tmp/cleanup_downloads_lists_count.tmp
+  else
+    CLEANUP_DOWNLOADS_LISTS_COUNT="Error beim lesen der Datei."
+  fi
+  sleep 1
 else
-  CLEANUP_DOWNLOADS_LISTS_COUNT="Error beim lesen der Datei."
+  CLEANUP_DOWNLOADS_LISTS_COUNT="Deaktiviert"
 fi
-sleep 1
 # ---------------
 
 
 # SOURCETV
 # ---------------
-echo "Loesche alte Demo/SourceTv Dateien..."
-# COUNT FILES
-find $DIR/$SRCDSDIR/$GAMEMOD/ -type f -name "*.dem" -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_demo_count.tmp
-find $DIR/$SRCDSDIR/$GAMEMOD/logs/ -type f -name "*.dem" -mtime +$LOGTIME $LOGEXEC
+# CHECK OB AKTIVIERT
+if [ "$CLEANUP_SOURCETV" == "1" ] || [ "$CLEANUP_SOURCETV" == "on" ]; then
+  echo "Loesche alte Demo/SourceTv Dateien..."
+  # COUNT FILES
+  find $DIR/$SRCDSDIR/$GAMEMOD/ -type f -name "*.dem" -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_demo_count.tmp
+  find $DIR/$SRCDSDIR/$GAMEMOD/ -type f -name "*.dem" -mtime +$LOGTIME $LOGEXEC
 
-# AMOUNT OF REMOVED FILES
-if [ -f "$DIR/tmp/cleanup_demo_count.tmp" ]; then
-  CLEANUP_DEMO_COUNT="`cat $DIR/tmp/cleanup_demo_count.tmp`"
-  rm -f $DIR/tmp/cleanup_demo_count.tmp
+  # AMOUNT OF REMOVED FILES
+  if [ -f "$DIR/tmp/cleanup_demo_count.tmp" ]; then
+    CLEANUP_DEMO_COUNT="`cat $DIR/tmp/cleanup_demo_count.tmp`"
+    rm -f $DIR/tmp/cleanup_demo_count.tmp
+  else
+    CLEANUP_DEMO_COUNT="Error beim lesen der Datei."
+  fi
+  sleep 1
 else
-  CLEANUP_DEMO_COUNT="Error beim lesen der Datei."
+  CLEANUP_DEMO_COUNT="Deaktiviert"
 fi
-sleep 1
 # ---------------
 
 
 # BACKUPS
 # ---------------
-echo "Loesche alte Backup Dateien..."
-# COUNT FILES
-find $DIR/tmp/ -type f -name "*.tar*" -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_backup_count.tmp
-find $DIR/tmp/ -type f -name "*.tar*" -mtime +$LOGTIME $LOGEXEC
+# CHECK OB AKTIVIERT
+if [ "$CLEANUP_BACKUPS" == "1" ] || [ "$CLEANUP_BACKUPS" == "on" ]; then
+  echo "Loesche alte Backup Dateien..."
+  # COUNT FILES
+  find $DIR/tmp/ -type f -name "*.tar*" -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_backup_count.tmp
+  find $DIR/tmp/ -type f -name "*.tar*" -mtime +$LOGTIME $LOGEXEC
 
-# AMOUNT OF REMOVED FILES
-if [ -f "$DIR/tmp/cleanup_backup_count.tmp" ]; then
-  CLEANUP_BACKUP_COUNT="`cat $DIR/tmp/cleanup_backup_count.tmp`"
-  rm -f $DIR/tmp/cleanup_backup_count.tmp
+  # AMOUNT OF REMOVED FILES
+  if [ -f "$DIR/tmp/cleanup_backup_count.tmp" ]; then
+    CLEANUP_BACKUP_COUNT="`cat $DIR/tmp/cleanup_backup_count.tmp`"
+    rm -f $DIR/tmp/cleanup_backup_count.tmp
+  else
+    CLEANUP_BACKUP_COUNT="Error beim lesen der Datei."
+  fi
+  sleep 1
 else
-  CLEANUP_BACKUP_COUNT="Error beim lesen der Datei."
+  CLEANUP_BACKUP_COUNT="Deaktiviert"
 fi
-sleep 1
 # ---------------
 
 clear; echo -e $GELB"Server wurde aufgeraeumt."$FARBLOS
@@ -1329,6 +1432,7 @@ echo "22) help|h                    - Zeigt diese Hilfe an"
 echo ""
 echo ""
 echo "Command {--nocolors|-c}       - Unterdrueckt die Shellfarben."
+echo "Command {--force|-f}          - Erzwinge Funktion."
 }
 
 

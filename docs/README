@@ -269,12 +269,13 @@ Sometext -- FIXME
 	  -L           - Turn on output logging.
 
 	  
-	  MAPLIST_EXCLUDES          - Wird durch folgende inputs deaktiviert: "0|disabled" 
-      MAPLIST_INCLUDE_ONLY      - Wird durch folgende inputs deaktiviert: "0|disabled" 
+	  MAPLIST_EXCLUDES          - Wird durch folgende Inputs deaktiviert: "0|disabled" 
+      MAPLIST_INCLUDE_ONLY      - Wird durch folgende Inputs deaktiviert: "0|disabled" 
 	  PRECONFIGURE 	            - "0|1"
 	  PRECONFDEL                - "0|1"
 	  LOGTIME                   - "1-365"
 	  CRON_LOGGING              - "0|1"
+	  CHECK_BEFORE_SHUTDOWN     - Wird durch folgende Inputs aktiviert: "1|on"
 	  	  
 	  
 	  
@@ -313,6 +314,13 @@ Folgende Parameter gibt es in der Config ein zu stellen.
 	Templatesurl          - URL von welcher Templates bezogen werden.
 	Maplist_excludes      - Excludiert angegebe Maps (Auch mit Jokern) aus der Maplist/Mapcycle-Datei. Wird durch folgende inputs deaktiviert: "0|disabled" --- Beispiel: MAPLIST_EXCLUDES="test_*|meinemap|de_*"
 	Maplist_include_only  - Includiert nur folgende Maps (Auch mit Jokern) in die Maplist/Mapcycle-Datei, und schliesst excludes aus. Wird durch folgende inputs deaktiviert: "0|disabled" --- Beispiel: MAPLIST_INCLUDE_ONLY="ba_*|fy_*"
+    Check_before_shutdown - Prueft vor einer Aktion die einen Neustart des Gameservern benoetigt, ob noch Spieler auf dem Server sind. (Kann mit -f geforced werden)
+	Cleanup_ztmp          - Bestimmt ob Ztmp Dateien mit in das Cleanup einbezogen werden sollen.
+	Cleanup_logs          - Bestimmt ob Logs mit in das Cleanup einbezogen werden sollen.
+	Cleanup_downloads     - Bestimmt ob Downloads mit in das Cleanup einbezogen werden sollen.
+	Cleanup_downloadlists - Bestimmt ob DownloadLists mit in das Cleanup einbezogen werden sollen.
+	Cleanup_SourceTv      - Bestimmt ob SourceTv Dateien mit in das Cleanup einbezogen werden sollen.
+	Cleanup_backup        - Bestimmt ob Backups mit in das Cleanup einbezogen werden sollen.
 --------------------------------------. 
 
 
@@ -350,6 +358,9 @@ ____________________________
 	20) cronjob|crontab|cron      - Erstellt einen Taeglichen Cronjob
 	21) makevdf|vdf               - Erstellt .vdf Dateien fuer verschiedene Addons.
 	22) help|h                    - Zeigt diese Hilfe an
+	
+	{--nocolors|-c}               - Unterdrueckt die Shellfarben."
+    {--force|-f}                  - Erzwinge Funktion."
 --------------------------------------
 
 

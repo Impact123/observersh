@@ -238,6 +238,10 @@ Server.sh CHANGELOG
   - Backupps werden nun auch geloescht
   - Zeit zwischen Aktionen verkuertzt
   - Auflisting uebersichtlicher gestaltet
+  - Check_Before_Shutdown Funktion zugefuegt
+  
+ - Backup:
+  - Check_Before_Shutdown Funktion zugefuegt
  
  - Make:
   - Make euberprueft nun ob alle Dateien vorhanden sind, und speichert nur diese
@@ -247,6 +251,16 @@ Server.sh CHANGELOG
   
 - Main:
  - RM wird nun geforced
+ - Zusatztparameter -f und --force zugefuegt
+ 
+ - Config:
+  - Variable Check_Before_Shutdown zugefuegt
+  - Variable Cleanup_Ztmp zugefuegt
+  - Variable Cleanup_Logs zugefuegt
+  - Variable Cleanup_Downloads zugefuegt
+  - Variable Cleanup_DownloadLists zugefuegt
+  - Variable Cleanup_SourceTv zugefuegt
+  - Variable Cleanup_Backup zugefuegt
   
 
 
