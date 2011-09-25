@@ -1,4 +1,4 @@
-observersh ist ein umfangreiches Startscript für Spiele die auf der Orangebox - Engine von Valve basieren. Darunter zaehlen Beispielsweise:
+observersh ist ein umfangreiches Startscript fuer Spiele die auf der Orangebox - Engine von Valve basieren. Darunter zaehlen Beispielsweise:
 
 	Left4Dead
 	Left4Dead2
