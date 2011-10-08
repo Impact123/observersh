@@ -164,39 +164,27 @@ fi
 
 
 # --- PARAMETERZUSAETZE --- #
+while getopts "cfCF" StartParams; do
+case "$StartParams" in
 
-COLOR_PARAMS='\--nocolors$|\-c$'
-
-# PARAMETER NACH FUNKTION
-if [[ `echo $* |grep -E "$COLOR_PARAMS" ` ]]; then
+c|C)
   GELB=""
   ROT=""
   FARBLOS=""
-fi
+;;
 
-# PARAMETER VOR FUNKTION
-if [[ "$(echo $1 |grep -E "$COLOR_PARAMS")" ]]; then
-  GELB=""
-  ROT=""
-  FARBLOS=""
-  shift
-fi
-
-# --- 
-
-FORCE_PARAMS='\--force$|\-f$'
-
-# PARAMETER NACH FUNKTION
-if [[ `echo $* |grep -E "$FORCE_PARAMS" ` ]]; then
+f|F)
   FORCE_ACTIONS="1"
-fi
+;;
 
-# PARAMETER VOR FUNKTION
-if [[ "$(echo $1 |grep -E "$FORCE_PARAMS")" ]]; then
-  FORCE_ACTIONS="1"
-  shift
-fi
+\?)
+  echo "Error: Falscher Startparameter."
+  exit 1
+;;
 
+esac
+done
+shift $(($OPTIND -1))
 # --- PARAMETERZUSAETZE --- #
  
  
@@ -242,7 +230,7 @@ fi
 
 # LOGTIMECHECK
 if [[ `find $DIR/$SRCDSDIR/$LOGDIR/ -type f -name "screenlog.0_*"` ]]; then 
-  find $DIR/$SRCDSDIR/$LOGDIR/ -type f -name "screenlog.0_*" -mtime $LOGTIME $LOGEXEC
+  find $DIR/$SRCDSDIR/$LOGDIR/ -type f -name "screenlog.0_*" -mtime +$LOGTIME $LOGEXEC
 fi
 
 # PORTCHECK
@@ -272,18 +260,17 @@ fi
 
 # --- EXTENSIONS --- #
 
-# SOURCETV_EXTENSION
-if [ -f "$DIR/extensions/sourcetv_extension.sh" ]; then
-  chmod 755 $DIR/extensions/sourcetv_extension.sh
-  $DIR/extensions/sourcetv_extension.sh start
-fi
+# FUER JEDE EXTENSION IM ORDNER
+for EXTENSION in $(find $DIR/extensions/ -type f -name "*_extension.sh" |awk -F "extensions/" {'print $2'}); do
 
-# ADVERT_EXTENSION
-if [ -f "$DIR/extensions/advert_extension.sh" ]; then 
-  chmod 775 $DIR/extensions/advert_extension.sh
-  $DIR/extensions/advert_extension.sh start
-fi
-
+# FALLS AUSFUEHRBAR
+  if [ ! -x "$DIR/extensions/$EXTENSION" ]; then
+    chmod 700 $DIR/extensions/$EXTENSION
+  else
+    $DIR/extensions/$EXTENSION start
+  fi
+done
+# --- EXTENSIONS --- #
 }
 # ---------------------------------------------------------------------------------------------
 
@@ -292,6 +279,36 @@ fi
 # STOP
 # ---------------------------------------------------------------------------------------------
 function SERVER_SH_STOP {
+
+# FALLS FORCE
+if [ "$FORCE_ACTIONS" == "1" ]; then
+  CHECK_BEFORE_SHUTDOWN="0"
+fi
+
+# WENN CHECK AKTIVIERT
+if [ "$CHECK_BEFORE_SHUTDOWN" == "1" ] || [ "$CHECK_BEFORE_SHUTDOWN" == "on" ]; then
+
+  # FALLS SERVER ANPINGBAR
+  if [ ! "`$QUAKESTAT -$QSTAT $IP:$PORT | grep -v ADDRESS | awk '{ print $2 }' | awk -F/ ' { print $1}'`" == "DOWN" ]; then
+
+  # FALLS UNTER 10 SPIELER
+    if [[ ! "$($QUAKESTAT -$QSTAT $IP:$PORT |grep -v 'ADDRESS' |awk '{print $2}' |awk -F '/' '{print $2}')" == "$MAXPLAYERS" ]]; then
+      PLAYERS_ONLINE="`$QUAKESTAT -$QSTAT $IP:$PORT |grep -v 'ADDRESS' |awk  '{print $2,$3}' |tr -d ' ' |awk -F '/' {'print $1'}`"
+    else
+      PLAYERS_ONLINE="`$QUAKESTAT -$QSTAT $IP:$PORT |grep -v 'ADDRESS' |awk  '{print $2}' |awk -F '/' {'print $1'}`"
+    fi
+	
+	# FALLS SPIELERZAHL UEBER NULL
+	if [ ! "$PLAYERS_ONLINE" == "0" ]; then
+      clear; echo -e $GELB"Es sind '$PLAYERS_ONLINE' Spieler auf dem Server, Server wird nicht gestoppt."$FARBLOS
+	  exit
+	fi
+	
+  fi
+  
+fi
+
+
 # CHECK OB SERVER LAEUFT
 if [[ `screen -ls |grep $SCREENNAME-running` ]]; then
   screen -dr $SCREENNAME-running -X quit 
@@ -302,17 +319,18 @@ fi
 
 # --- EXTENSIONS --- #
 
-# SOURCETV_EXTENSION
-if [ -f "$DIR/extensions/sourcetv_extension.sh" ]; then 
-  chmod 755 $DIR/extensions/sourcetv_extension.sh
-  $DIR/extensions/sourcetv_extension.sh stop
-fi
+# FUER JEDE EXTENSION IM ORDNER
+for EXTENSION in $(find $DIR/extensions/ -type f -name "*_extension.sh" |awk -F "extensions/" {'print $2'}); do
 
-# ADVERT_EXTENSION
-if [ -f "$DIR/extensions/advert_extension.sh" ]; then 
-  chmod 755 $DIR/extensions/advert_extension.sh
-  $DIR/extensions/advert_extension.sh stop
-fi
+# FALLS AUSFUEHRBAR
+  if [ ! -x "$DIR/extensions/$EXTENSION" ]; then
+    chmod 700 $DIR/extensions/$EXTENSION
+  else
+    $DIR/extensions/$EXTENSION stop
+  fi
+done
+# --- EXTENSIONS --- #
+
 }
 # ---------------------------------------------------------------------------------------------
 
@@ -417,6 +435,7 @@ function SERVER_SH_STATUS {
 # FALLS KEIN SCREENNAMEN GEFUNDEN WURDE --- TESTING ---
 if [[ ! `screen -ls |grep $SCREENNAME-` ]]; then
   echo -e $GELB"Zurzeit werden auf diesem Server keine Aktivitaeten Ausgefuehrt."$FARBLOS
+  # FIXME
   exit
 fi
 
@@ -457,15 +476,17 @@ fi
 
 # --- EXTENSIONS --- #
 
-# SOURCETV_EXTENSION
-if [[ `screen -ls |grep $SCREENNAME-sourcetv` ]]; then
-  echo -e $GELB"SourceTv Daemon laeuft."$FARBLOS
-fi
+# FUER JEDE EXTENSION IM ORDNER
+for EXTENSION in $(find $DIR/extensions/ -type f -name "*_extension.sh" |awk -F "extensions/" {'print $2'}); do
 
-# ADVERT_EXTENSION
-if [[ `screen -ls |grep $SCREENNAME-advert` ]]; then
-  echo -e $GELB"Advert Daemon laeuft."$FARBLOS
-fi
+# FALLS AUSFUEHRBAR
+  if [ ! -x "$DIR/extensions/$EXTENSION" ]; then
+    chmod 700 $DIR/extensions/$EXTENSION
+  else
+    $DIR/extensions/$EXTENSION status
+  fi
+done
+# --- EXTENSIONS --- #
 }
 # ---------------------------------------------------------------------------------------------
 
@@ -634,7 +655,7 @@ if [ "$CHECK_BEFORE_SHUTDOWN" == "1" ] || [ "$CHECK_BEFORE_SHUTDOWN" == "on" ]; 
 	
 	# FALLS SPIELERZAHL UEBER NULL
 	if [ ! "$PLAYERS_ONLINE" == "0" ]; then
-      clear; echo -e $GELB"Es sind '$PLAYERS_ONLINE' Spieler auf dem Server, Update wird nicht fortgesetzt."$FARBLOS
+      clear; echo -e $GELB"Es sind '$PLAYERS_ONLINE' Spieler auf dem Server, Backup wird nicht fortgesetzt."$FARBLOS
 	  exit
 	fi
 	
@@ -1085,9 +1106,13 @@ function SERVER_SH_CLEANUP {
 if [ "$CLEANUP_ZTMP" == "1" ] || [ "$CLEANUP_ZTMP" == "on" ]; then
   echo "Loesche alte Ztmp Dateien..."
   # COUNT FILES
-  find $DIR/$SRCDSDIR/$GAMEMOD/ -name "*.ztmp" -mtime $LOGTIME | wc -l > $DIR/tmp/cleanup_ztmp_count.tmp
-  find $DIR/$SRCDSDIR/$GAMEMOD/ -name "*.ztmp" -mtime $LOGTIME $LOGEXEC
-
+  # CHECK OB ORDNER VORHANDEN SourceTv
+  if [ -d "$DIR/$SRCDSDIR/$GAMEMOD" ]; then
+    find $DIR/$SRCDSDIR/$GAMEMOD/ -name "*.ztmp" -mtime +$LOGTIME | wc -l > $DIR/tmp/cleanup_ztmp_count.tmp
+    find $DIR/$SRCDSDIR/$GAMEMOD/ -name "*.ztmp" -mtime +$LOGTIME $LOGEXEC
+  fi
+  
+  
   # AMOUNT OF REMOVED FILES
   if [ -f "$DIR/tmp/cleanup_ztmp_count.tmp" ]; then
     CLEANUP_ZTMP_COUNT="`cat $DIR/tmp/cleanup_ztmp_count.tmp`"
@@ -1110,10 +1135,10 @@ if [ "$CLEANUP_LOGS" == "1" ] || [ "$CLEANUP_LOGS" == "on" ]; then
   echo "Loesche alte Log Dateien..."
   # COUNT FILES
   # CHECK OB ORDNER VORHANDEN LOGS
-  #if [ -d "$DIR/$SRCDSDIR/$GAMEMOD/logs" ]; then
+  if [ -d "$DIR/$SRCDSDIR/$GAMEMOD" ]; then
     find $DIR/$SRCDSDIR/$GAMEMOD/ -type f -name "*.log" -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_log_count.tmp
     find $DIR/$SRCDSDIR/$GAMEMOD/ -type f -name "*.log" -mtime +$LOGTIME $LOGEXEC
-  #fi
+  fi
 
 
   # AMOUNT OF REMOVED FILES
@@ -1136,9 +1161,11 @@ fi
 if [ "$CLEANUP_DOWNLOADS" == "1" ] || [ "$CLEANUP_DOWNLOADS" == "on" ]; then
   echo "Loesche alte Download Dateien..."
   # COUNT FILES
+  # CHECK OB ORDNER VORHANDEN DOWNLOADS
+  if [ -d "$DIR/$SRCDSDIR/$GAMEMOD/downloads" ]; then
     find $DIR/$SRCDSDIR/$GAMEMOD/downloads/ -type f -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_downloads_count.tmp
     find $DIR/$SRCDSDIR/$GAMEMOD/downloads/ -type f -mtime +$LOGTIME $LOGEXEC
-
+  fi
 
   # AMOUNT OF REMOVED FILES
   if [ -f "$DIR/tmp/cleanup_downloads_count.tmp" ]; then
@@ -1187,8 +1214,11 @@ fi
 if [ "$CLEANUP_SOURCETV" == "1" ] || [ "$CLEANUP_SOURCETV" == "on" ]; then
   echo "Loesche alte Demo/SourceTv Dateien..."
   # COUNT FILES
-  find $DIR/$SRCDSDIR/$GAMEMOD/ -type f -name "*.dem" -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_demo_count.tmp
-  find $DIR/$SRCDSDIR/$GAMEMOD/ -type f -name "*.dem" -mtime +$LOGTIME $LOGEXEC
+  # CHECK OB ORDNER VORHANDEN SOURCETV
+  if [ -d "$DIR/$SRCDSDIR/$GAMEMOD" ]; then
+    find $DIR/$SRCDSDIR/$GAMEMOD/ -type f -name "*.dem" -mtime +$LOGTIME |wc -l > $DIR/tmp/cleanup_demo_count.tmp
+    find $DIR/$SRCDSDIR/$GAMEMOD/ -type f -name "*.dem" -mtime +$LOGTIME $LOGEXEC
+  fi
 
   # AMOUNT OF REMOVED FILES
   if [ -f "$DIR/tmp/cleanup_demo_count.tmp" ]; then
@@ -1431,8 +1461,8 @@ echo ""
 echo "22) help|h                    - Zeigt diese Hilfe an"
 echo ""
 echo ""
-echo "Command {--nocolors|-c}       - Unterdrueckt die Shellfarben."
-echo "Command {--force|-f}          - Erzwinge Funktion."
+echo "Option { -c Funktion}         - Unterdrueckt die Shellfarben."
+echo "Option { -f Funtkion}         - Erzwingt Funktion."
 }
 
 

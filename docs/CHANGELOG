@@ -190,7 +190,7 @@ Server.sh CHANGELOG
 - Check ob der Server ordnungsgemaess gestartet wurde -- FIXME --
 - Addonsystem umgeschrieben.
   - Nur noch ein Addon fuer alle Spiele notwendig.
-  - Vdf´s werden automatisch erstellt.
+  - Vdf's werden automatisch erstellt.
 - Shebang aus Config entfernt
 - Updateversion Verbessert
  - Check Falls Features nicht abrufbar
@@ -206,7 +206,7 @@ Server.sh CHANGELOG
 # 12.08.2011
 # Version: 0.2.5-Beta2
 - Grosses Update der README
-- Es wurde ein Bug in der addonremove Funktion behoben, wo es passieren kann, dass Leerzeichen in addon.addonlist Probleme während Entfernung verursachen. 
+- Es wurde ein Bug in der addonremove Funktion behoben, wo es passieren kann, dass Leerzeichen in addon.addonlist Probleme waehrend Entfernung verursachen. 
 - Ein Ordnercheck-Bug in Addoninstall wurde gefixt
 - IP-Check ueberarbeitet
  - Check ob deutsches System
@@ -239,6 +239,8 @@ Server.sh CHANGELOG
   - Zeit zwischen Aktionen verkuertzt
   - Auflisting uebersichtlicher gestaltet
   - Check_Before_Shutdown Funktion zugefuegt
+  - Checks ob Ordner vorhanden
+  
   
  - Backup:
   - Check_Before_Shutdown Funktion zugefuegt
@@ -251,8 +253,15 @@ Server.sh CHANGELOG
   
 - Main:
  - RM wird nun geforced
- - Zusatztparameter -f und --force zugefuegt
+ - Zusatzparameter -c und -f zugefuegt
+ - Fehler beim loeschen von alten Logs behoben (Screenlog)
  
+- Stop:
+  - Check_Before_Shutdown Funktion zugefuegt
+  
+- Update:
+  - Check_Before_Shutdown Funktion zugefuegt
+  
  - Config:
   - Variable Check_Before_Shutdown zugefuegt
   - Variable Cleanup_Ztmp zugefuegt
@@ -261,6 +270,12 @@ Server.sh CHANGELOG
   - Variable Cleanup_DownloadLists zugefuegt
   - Variable Cleanup_SourceTv zugefuegt
   - Variable Cleanup_Backup zugefuegt
-  
+  - Neue Startparameterfunktion
+    - ./server.sh {-c -f -cf -fc} Funktion
 
+- Extension:
+  - Support fuer eigene Extensions
+  
+Make:
+  - Exitcode angepasst
 

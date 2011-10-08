@@ -276,6 +276,12 @@ Sometext -- FIXME
 	  LOGTIME                   - "1-365"
 	  CRON_LOGGING              - "0|1"
 	  CHECK_BEFORE_SHUTDOWN     - Wird durch folgende Inputs aktiviert: "1|on"
+	  CLEANUP_ZTMP              - Wird durch folgende Inputs aktiviert: "1|on"
+      CLEANUP_LOGS              - Wird durch folgende Inputs aktiviert: "1|on"
+      CLEANUP_DOWNLOADS         - Wird durch folgende Inputs aktiviert: "1|on"
+      CLEANUP_DOWNLOADLISTS     - Wird durch folgende Inputs aktiviert: "1|on"
+      CLEANUP_SOURCETV          - Wird durch folgende Inputs aktiviert: "1|on"
+      CLEANUP_BACKUP            - Wird durch folgende Inputs aktiviert: "1|on"
 	  	  
 	  
 	  
@@ -359,8 +365,8 @@ ____________________________
 	21) makevdf|vdf               - Erstellt .vdf Dateien fuer verschiedene Addons.
 	22) help|h                    - Zeigt diese Hilfe an
 	
-	{--nocolors|-c}               - Unterdrueckt die Shellfarben."
-    {--force|-f}                  - Erzwinge Funktion."
+	{Option --nocolors|-c}        - Unterdrueckt die Shellfarben."
+    {Option -f}                   - Erzwingt Funktion."
 --------------------------------------
 
 

@@ -11,7 +11,7 @@ for i in $FILES; do
   fi
 done
 
-[ $LOCK == "1" ] && exit 0
+[ $LOCK == "1" ] && exit 1
 
 RELEASE="server-$(cat version.txt |grep 'Version:' |awk {'print $2'}).tar.gz"
 
