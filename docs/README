@@ -1,0 +1,447 @@
+# Server.sh README -- Developerversion
+# 12.08.2011
+
+Einleitung:
+Die meisten der auf GuGy.eu angebotenen Scripte sind fuer den Privatgebrauch geschrieben, und damit zum Teil an eigenen Beduerfnisse angepasst.
+Das heisst, diese Scripte koennten bei ihnen je nach Konfiguration komplett anders funktionieren.
+Bedenken sie bitte, dass ich dafuer keine Verantwortug uebernehmen kann,
+und mich hiermit von jeglichen moeglicherweise auftretenden Problemen direkter oder indirekter Art distanziere.
+Verwendung des Scriptes auf eigene Gefahr.
+
+
+Vielen Dank dass sie sich dieses Script gedownloadet haben.
+Falls es ihnen gefaellt, koennen sie mir Kritik und Verbesserungsvorschlaege an support@gugy.eu senden.
+Konfigurationen nehmen sie bitte in der beiliegenden server.conf Datei vor.
+
+
+INFO: Dies ist nur eine allgemeine README, Funktionsbezogene Informationen koennen sie auf der Projektseite ansehen (Siehe unten: Hilfe, Support)
+
+
+
+
+BESONDERHEITEN DES SCRIPTES
+--------------------------------------
+	- Updater
+		- Einfache Updates gewaehrt durch:
+			- Gleich bleibende URL
+			- .
+		- Integrierte Funktion um bei Updates Backups des Scriptes so wie der Config zu erstellen.
+		
+	- Portcheck
+		- Checkt vor Start des Gameserver ob der angegebene Port bereits benutzt wird, um Komplikationen zu vermeiden.
+		
+	- Addoninstaller
+		- Eines der Extras welches besonders hervorgehoben werden muss, es ist in der Lage vorgefertigte Addons zu:
+			- Installieren
+			- Reinstallieren
+			- Entfernen
+	
+	- Extensions
+		- Nuetzliche Extensions die den Umfang des Scriptes erweitern, entweder als pure Extension oder Standalone.
+	
+	- CleanupFunktion
+		- Entfernt den Gameserver von unnuetzen Ballast wie:
+			- SourceTv Demos
+			- Ztmp Dateien
+			- Alten Logs
+			- Alten Downloads
+			- Alten DownloadLists
+			- Alten Backupps
+		
+	- BackupFunktion
+		- Backuppt nur die essentiellen Dateien des Gameservers, damit nur der Platz beansprucht wird der gebraucht wird.
+		- Mehrere Formate.
+		
+	- PreconfigureFunktion
+		- Installiert vorgefertigte zumeist kommentierte Minimal Configs um die Arbeit zu ersparen.
+		
+	- CronjobCreater
+		- Macht es einfach einen oder mehrere automatisierte taegliche Jobs anzulegen, zB um den Server zu restarten.
+		
+	- MaplistCreater
+		- Erstellt automatisch eine Mapcycle.txt, Maplist.txt der Maps, mit excludierung von test_ Maps.
+		
+	- StatusFunktion 
+		- Playeranzahl
+		- Map
+		- Ip
+		- Port
+		- ServerName
+		
+	- MAIN
+		- Auslesen der IP, Portcheck
+		
+	- Vdfmaker
+		- Eine Funktion die zB fuer den Addoninstaller genutzt wird um ein Addon fuer mehrere Spiele zu nutzen.
+	
+	- Watchlog
+		- Zeigt den letzten Screenlog an.
+		
+	
+
+
+
+--------------------------------------
+
+
+
+
+INHALTSVERZEICHNIS
+--------------------------------------
+	- Abschnitt: 1 - Installation
+		- Abschnitt: 1.1 - Zusaetzliche Vereinfacherungen
+		
+	- Abschnitt: 2 - Konfiguration
+		- Abschnitt: 2.1 - Hinweise zur Konfiguration
+		
+	- Abschnitt: 3 - Infos und Hilfe
+		- Abschnitt: 3.1 - Mitgelieferte Dateien
+		- Abschnitt: 3.2 - Vom Script erstellte Ordner
+		- Abschnitt: 3.3 - Bevor man das Script verwendet
+		- Abschnitt: 3.4 - Erklaerung der Parameter
+			- Abschnitt 3.4.1 - Developerinfo
+			
+		- Abschnitt: 3.5 - Ausfuehrbare Befehle
+	
+	- Abschnitt: 4 - Hilfe Support Bugs und Featurewuensche
+		- Abschnitt: 4.1 - Kontakt
+		- Abschnitt: 4.2 - Einen Fehler melden
+		- Abschnitt: 4.3 - Bekannte Probleme 
+		- Abschnitt: 4.3 - FAQ - Haeufig gestellte Fragen
+		
+--------------------------------------
+
+
+
+
+Abschnitt: 1 - Installation:
+--------------------------------------
+	1.) Lesen sie die komplette Readme durch bevor sie mit der Installation beginnen!
+	2.) Entpacken sie das Archiv
+	3.) Geben sie falls noch nicht geschehen, der Server.sh Ausfuehrungsberechtigungen (Chmod)
+	4.) Passen sie die Konfigurationsdatei an. siehe Pkt2
+--------------------------------------
+
+
+
+
+Abschnitt: 1.1 - Zusaetzliche Vereinfacherungen
+--------------------------------------
+Wenn sie wollen, koennen sie so genannte Aliases anlegen.
+Wie genau das geht koennen sie zB hier nachlesen.
+http://wiki.ubuntuusers.de/alias
+
+Unten ist der Abschnitt mit den Wichtigsten Aliases den sie benutzen koennen.
+Dies ist allerdings kein Muss, und dient lediglich zur Vereinfachung der Arbeit.
+
+Am schnellsten und einfachsten ist es die server_min Extension zu installieren,
+Downloads und Infos sind auf der Projektseite bzw im Downloadarchiv zu finden (Siehe unten: Hilfe, Support)
+
+	# ---
+	# Aliases fuer .bashrc/.profile
+	alias gstart='./server.sh start'
+	alias gstop='./server.sh stop'
+	alias gstatus='./server.sh status'
+	alias grestart='./server.sh restart'
+	alias gupdate='./server.sh update'
+	alias gwatch='./server.sh watch'
+	alias gping='./server.sh ping'
+	alias gbackup='./server.sh backup'
+	alias ghelp='./server.sh help'
+	alias gss='./server.sh'
+	# ---
+--------------------------------------
+
+
+
+
+Abschnitt: 2 - Konfiguration:
+--------------------------------------
+Bearbeiten sie die Configdatei oder Das Script unter Windows nur mit einem Editor der Unix Zeilenumbrueche Versteht, zB Notepad ++
+Wenn sie einen Fehler wie: 
+
+	- /bin/bash^M: bad interpreter: No such file or directory
+	
+bekommen, haben sie vermutlich einen Falschen Editor benutzt.
+--------------------------------------
+
+
+
+
+Abschnitt: 2.1 - Hinweise zur Konfiguration der Server.sh Configfile:
+--------------------------------------
+Sie sollten den Gebrauch von Sonderzeichen in der Config bzw generell Shellscripten vermeiden,
+da dies haufig zu haesslichen Fehlern fuehrt.
+
+Falls sie in einem der Befehle bzw Parameter Anfuehrungszeichen machen muessen, (zB weil ein Kommando Leerzeichen enthaelt) dann muessen diese escaped werden.
+Hier ein Beispiel:
+
+	---
+	EXTRA="+alias fps_max \"say Variable locked\""
+	BACKUP_FILES="server.sh --exclude \"*.tar.gz\""
+	---
+
+Damit sie die Uebersicht behalten, empfehle ich zuerst das Commando komplett auf zu schreiben,
+und erst am Ende die Anfuehrungszeichen zu escapen.
+--------------------------------------
+
+
+
+
+Abschnitt: 3 - Infos und Hilfe
+--------------------------------------
+	-
+--------------------------------------
+
+
+
+
+Abschnitt: 3.1 - Mitgelieferte Dateien
+--------------------------------------
+Wenn sie das Script downloaden, liegen normalerweise folgende Dateien bei:
+
+	- server.sh         - Eigentliches Script.
+	- server.conf       - Konfigurationsdatei des Scriptes.                  | Wird bei einem Update excludiert falls vorhanden, bzw gebackuppt falls noetig 
+	- make              - Script mit welchem das Tar.gz Archiv gepackt wurde | falls man Backuppen moechte oder aehnliches, wird bei Updates excludiert.
+	- version.txt       - Versionsdatei des Scriptes                         | nur als Info fuer den Benutzer und fuer make.
+	- docs/README       - Readme Datei des Scriptes
+	- docs/CHANGELOG    - Changelog Datei des Scriptes
+	- docs/LICENCE      - Lizensdatei (GPLv3)
+--------------------------------------
+
+
+
+
+
+Abschnitt: 3.2 - Vom Script erstellte Ordner
+--------------------------------------
+Wenn das Script ausgefuehrt wird, erstellt es folgende Ordner um bestimmte Funtkionen zu nutzen:
+
+	- tmp               - Verzeichnis fuer Temporaere Dateien                | Cronjobs, Backups, usw 
+	- extensions        - Verzeichnis fuer Extensions
+--------------------------------------
+
+
+
+
+Abschnitt: 3.3 - Bevor man das Script verwendet
+--------------------------------------
+Das Script und/oder zugehoerige Extensions greifen unter anderem auf folgende Programme zurueck, daher sollten sie diese installiert haben:
+
+	- Bzip2
+	- Screen
+	- Qstat/Quakestat
+	- Awk*
+	- Netstat*
+	- Grep*
+	- Date*
+	- Find*
+	- Lftp**
+
+* Normalerweise bei System dabei.
+** Haefuig von Extensions genutzt
+
+Versichern sie sich auch, dass sie alle noetigen Bibliotheken installiert haben die sie brauchen.
+Ein Haeufiger Fehler ist zB das nicht existieren der ia32-libs bei 64 Bit Systemen.
+--------------------------------------
+
+
+
+
+Abschnitt: 3.4.1 - Sometext -- FIXME
+--------------------------------------
+Sometext -- FIXME
+
+	-autoupdate    - Automatisches Update und  Restart nach Fehlern.
+	-nobots        - Deaktiviert Bots.
+	-tvdisable     - Deaktiviert Tv-Server.
+	-nohltv        - Deaktiviert Tv-Server.
+	+maxplayers    - Maximale Slotanzahl.
+	+ip            - Ip Mitgeben.
+	-port          - Serverport.
+	+tv_port       - Tv_Port.
+	+map           - Startmap.
+	-game          - Spielname.
+	-dmSL Name     - Screenname.
+	  -d (-r)      - Detach the elsewhere running screen (and reattach here).
+	  -m           - ignore $STY variable, do create a new screen session.
+	  -S sockname  - Name this session <pid>.sockname instead of <pid>.<tty>.<host>.
+	  -L           - Turn on output logging.
+
+	  
+	  MAPLIST_EXCLUDES          - Wird durch folgende Inputs deaktiviert: "0|disabled" 
+      MAPLIST_INCLUDE_ONLY      - Wird durch folgende Inputs deaktiviert: "0|disabled" 
+	  PRECONFIGURE 	            - "0|1"
+	  PRECONFDEL                - "0|1"
+	  LOGTIME                   - "1-365"
+	  CRON_LOGGING              - "0|1"
+	  CHECK_BEFORE_SHUTDOWN     - Wird durch folgende Inputs aktiviert: "1|on"
+	  CLEANUP_ZTMP              - Wird durch folgende Inputs aktiviert: "1|on"
+      CLEANUP_LOGS              - Wird durch folgende Inputs aktiviert: "1|on"
+      CLEANUP_DOWNLOADS         - Wird durch folgende Inputs aktiviert: "1|on"
+      CLEANUP_DOWNLOADLISTS     - Wird durch folgende Inputs aktiviert: "1|on"
+      CLEANUP_SOURCETV          - Wird durch folgende Inputs aktiviert: "1|on"
+      CLEANUP_BACKUP            - Wird durch folgende Inputs aktiviert: "1|on"
+	  	  
+	  
+	  
+----------------------------
+
+
+
+
+Abschnitt: 3.4 - Erklaerung der Parameter
+--------------------------------------
+Folgende Parameter gibt es in der Config ein zu stellen.
+
+	Dir                   - Kompletter Pfad zum Hauptordner des Servers zB /home/css/work (Geben sie bitte keinen Slash am Ende an).
+	Screenname            - Name des Screen Sockets unter welchem der Server spaeter laufen wird (Siehe oben).
+	Ip                    - Mit dieser IP wird der Server gestartet.
+	Maxplayers            - Gibt die Anzahl der Slots aus.
+	Port                  - Legt den Port fest mit welchem Der Server startet.
+	Screenoptions         - Befehle mit welcher der Screen erstellt wird Siehe oben.
+	Map                   - Map mit welcher der Server startet.
+	Extra                 - Zusaetzliche Parameter zum eigentlichen Startbefehl.
+	Srcdsdir              - Pfad zur eigentlichen Binary ab $DIR, zb orangebox.
+	Logdir                - Pfad in welchem die Screenlogs zwischengelagert werden, ab $DIR.
+	Gamemod               - Name der Spielmodifikation.
+	Updatemod             - Kompletter Name des Spieles.
+	Qstat                 - Kuerzel des Spieles das angepingt wird.
+	Date                  - Gibt das Datumsformat an in welchen die Screenlogs und Maplisten Archiviert werden.
+	Logtime               - Zeit nach der Die Screenlogs Automatisch geloescht werden in Tagen.
+	Logexec               - Befehl der auf die Logs nach der Logtime angewandt wird.
+	Preconfigure          - Falls auf 1 gesetzt wird falls noch nicht vorhanden, eine Minimale Server/Autoexec\.cfg erstellt.
+	Preconfdel            - Falls auf 1 gesetzt werden falls vorhanden, Die Server/Autoexec\.cfg gebackuppt und neue erstellt.
+	Quakestat             - Auf nicht Debian Systemen unterscheiden sich die Qstat Binarys namentlich, falls kein Debian im Einsatz ist muss diese Variable moeglicherweise angepasst werden. 
+	Backup_files          - Die Dateien des Gameservers welche gebackuppt werden (Siehe Abschnitt 2.).
+	Backup_format         - Format mit welchen die Backupps erstellt werden, (tar|tar.gz|tar.bz2)
+	Addonurl              - URL von welcher Addons fuer den Installer bezogen werden.
+	Cron_logging          - Hiermit wird beeinflusst ob Cronjobs Logfiles erstellen.
+	Templatesurl          - URL von welcher Templates bezogen werden.
+	Maplist_excludes      - Excludiert angegebe Maps (Auch mit Jokern) aus der Maplist/Mapcycle-Datei. Wird durch folgende inputs deaktiviert: "0|disabled" --- Beispiel: MAPLIST_EXCLUDES="test_*|meinemap|de_*"
+	Maplist_include_only  - Includiert nur folgende Maps (Auch mit Jokern) in die Maplist/Mapcycle-Datei, und schliesst excludes aus. Wird durch folgende inputs deaktiviert: "0|disabled" --- Beispiel: MAPLIST_INCLUDE_ONLY="ba_*|fy_*"
+    Check_before_shutdown - Prueft vor einer Aktion die einen Neustart des Gameservern benoetigt, ob noch Spieler auf dem Server sind. (Kann mit -f geforced werden)
+	Cleanup_ztmp          - Bestimmt ob Ztmp Dateien mit in das Cleanup einbezogen werden sollen.
+	Cleanup_logs          - Bestimmt ob Logs mit in das Cleanup einbezogen werden sollen.
+	Cleanup_downloads     - Bestimmt ob Downloads mit in das Cleanup einbezogen werden sollen.
+	Cleanup_downloadlists - Bestimmt ob DownloadLists mit in das Cleanup einbezogen werden sollen.
+	Cleanup_SourceTv      - Bestimmt ob SourceTv Dateien mit in das Cleanup einbezogen werden sollen.
+	Cleanup_backup        - Bestimmt ob Backups mit in das Cleanup einbezogen werden sollen.
+--------------------------------------. 
+
+
+
+
+Abschnitt: 3.5 - Ausfuehrbare Befehle
+--------------------------------------
+Folgende Befehle koennen sie benutzen.
+
+Usage: ./server.sh {Code/Befehl}
+Code | Befehl | Beschreibung
+____________________________
+
+	1)  start                     - Startet den Gameserver.
+	2)  stop                      - Stoppt den Gameserver.
+	3)  restart                   - Restartet den Gameserver.
+	4)  update|install            - Updatet/Installiert den Gameserver.
+	5)  status                    - Zeigt den Status des Gameservers.
+	6)  watch                     - Oeffnet die Screensession des Gameservers.
+	7)  watchupdate               - Oeffnet die Screensession des Updaters.
+	8)  ping                      - Pingt den Server an und checkt ob er online ist.
+	9)  maplistcreate             - Erstellt eine maplist/mapcycle\.txt aller .bsp Dateien in standartgemaess srcdsdir/moddir/maps.
+	10) listgames                 - Listet alle Spiele auf die ueber Steam bezogen werden koennen und schreibt sie in tmp/games_avaible.txt
+	11) backup                    - Backuppt den Gameserver in das Hauptverzeichnis mit Angabe des Datumsformates (siehe unten).
+	12) preconfigure              - Laed eine Minimale Server/Autoexec\.cfg eingetragenen Masterserver nach standartgemaess srcdsdir/moddir/cfg erstellt.
+	13) updateversion             - Prueft die Locale Scriptversion und vergleicht diese mit dem Updateserver
+								 [- falls eine neue Version vorhanden ist kann sie nach zustimmung geupdatet werden.
+								 [- Die alte Version geht dabei nicht verloren.
+	14) version                   - Zeigt lediglich die Version an.
+	15) addoninstall              - Laed ein Addon Von dem in der Config eingetragenen Masterserver und Installiert es.
+	16) addonremove               - Loescht ein Addon das Vom Masterserver bezogen werden kann.
+	17) addonlist                 - Listet alle Addons auf die ueber den Installer bezogen werden koennen
+	18) addons|addonlist_local    - Listet alle Addons auf die ueber den Installer installiert wurden
+	19) cleanup                   - Entfernt alte Logs, SourceTV Demos, Downloads und Ztmp Datein.
+	20) cronjob|crontab|cron      - Erstellt einen Taeglichen Cronjob
+	21) makevdf|vdf               - Erstellt .vdf Dateien fuer verschiedene Addons.
+	22) help|h                    - Zeigt diese Hilfe an
+	
+	{Option --nocolors|-c}        - Unterdrueckt die Shellfarben."
+    {Option -f}                   - Erzwingt Funktion."
+--------------------------------------
+
+
+
+
+Abschnitt: 4.0 - Hilfe Support Bugs und Featurewuensche
+--------------------------------------
+	-
+--------------------------------------
+
+
+
+
+Abschnitt: 4.1 - Kontakt
+--------------------------------------
+Sie koennen mich ueber folgende Wege kontaktieren.
+
+Web: 
+	- Projektseite: https://code.google.com/p/observersh
+	- Vorstellungsthread: http://sourceserver.info/board102-main/board5-dedicated-server/board29-anleitungen/3791-startscript-f-r-orangebox-games
+	- Download mit Archiv: http://downloads.gugy.eu/bash/server.sh
+			 
+Mail:
+	- info@gugy.eu
+--------------------------------------
+
+
+
+
+Abschnitt: 4.2 - Einen Fehler melden
+--------------------------------------
+Wenn sie einen Fehler, Bug, oder Featurewunsch melden moechten:
+
+Achten sie darauf einen Aussagekraeftigen Titel zu waehlen.
+Geben sie moeglichst viele Informationen an, sehr wichtig sind folgende:
+
+	- Welches System setzten sie ein
+		- 32/64 Bit
+		- Debian, Ubuntu, etc
+		
+	- Haben sie Veraenderungen am Script vorgenommen?
+		- Wenn ja welche?
+		
+	- Welche Version setzen sie ein 
+		- Debian 5, Debian 6, etc
+		
+	- Was haben sie eingegeben
+	
+	- Kompletter Fehlercode
+		Am besten exakt der Ausgabe, inklusive Formatierung
+		
+	- Komplette Configdatei
+--------------------------------------
+
+
+
+
+Abschnitt: 4.3 - Bekannte Probleme
+--------------------------------------
+	
+--------------------------------------
+
+
+
+
+Abschnitt: 4.3 - FAQ - Haeufig gestellte Fragen
+--------------------------------------
+Online verfuegbar unter:
+	- http://code.google.com/p/observersh/wiki/FAQ
+--------------------------------------
+
+
+
+
+
+
+ 
+ 

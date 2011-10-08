@@ -1,0 +1,281 @@
+Server.sh CHANGELOG
+# 07.07.2011
+
+
+ 
+ Changelog                                    
+---------------------------------------------------------------------------------------------
+  06.11.10                                   
+- Beschreibungen erweitert.                                      
+- Binary zugefuegt.
+- Pingcheck zugefuegt.
+- Watchupdate zugefuegt. 
+- Maplistcreate zugefuegt.
+- Kleine bugs gefixt.      
+ 
+ 
+ 
+ 
+  09.12.10
+- Kleinere Syntaxfehler beseitigt.
+- Updatefehler beseitigt.
+- Variables Datum.
+- Listgames zugefuegt.
+- Backup zugefuegt.
+- Kleine Aenderung im Statusbefehl.
+- Parameterpruefung.
+
+
+
+
+  10.12.10
+- Logdircheck ueberarbeitet. 
+- Logtime zugefuegt.
+- Logexec zugefuegt.   
+
+
+
+
+  17.12.10
+- Restart ueberarbeitet.
+- Trennlinien zur Uebersicht.
+- Funktion Variable und Parameter Preconfigure Zugefuegt.
+- Logbugs Gefixt.
+- Logfunktion Ueberarbeitet.
+- Statusanzeige komplett ueberarbeitet.
+
+
+
+
+  19.12.10
+- Script auf Configdatei umgestellt
+- Bugs in Update gefixt
+- Weitere Fixes     
+
+
+
+
+20.12.10
+- Doppelstarts gefixt
+- Backupparam zugefuegt  
+- Screenamen von status-name zu name-status geaendert
+ 
+
+ 
+ 
+21.12.10
+- Kleine Rechtschreibfehler ausgebessert
+- Portcheck eingebaut
+- Configlock eingebaut | Pruefung ob ein Update der Config notwendig ist.
+- Farbcodes eingebaut.
+- Script auf komplette Pfade umgestellt
+
+
+
+
+26.12.10
+- Ipausgabe falls nicht angegeben.
+- Funktion Addoninstall zugefuegt.
+- Funktion Addonremove zugefuegt.
+- Funktion Addonlist zugefuegt.
+
+
+
+
+04.01.11
+- Addoninstall Check ob Addon schon installiert ist | Abfrage der erneuten Installation
+- Funktion addons|addonlist_local eingebaut
+- Kleine Fixes
+      
+	   
+	   
+	   
+16.01.11
+- Weitere Variablen in den Cfgcreater eingebaut
+- Backupparameter erweitert
+
+
+
+
+06.03.11
+- Kleinen Fehler beim Farbcode ausgebessert
+
+
+
+
+29.03.11
+- Extension funktion fuer SourceTv Extension eingebaut
+
+
+
+
+03.04.11
+- Extension funktion fuer Advert Extension eingebaut
+- Status fuer Extensions zugefuegt
+
+
+
+	   	   
+04.04.11
+- Befehlcodes zugefuegt
+
+
+
+
+05.04.11
+- Cronjob Generator fuer taegliche Cronjobs zugefuegt [BETA]
+
+
+
+
+10.04.11
+- Cronjob Generator bearbeitet
+- Kleinere Codefixes	   	   
+
+
+
+
+13.04.11
+- Code ueberarbeitet/verduennt
+- Kleinere fixes	
+
+
+
+
+15.04.11
+- Status ueberarbeitet
+- if else Abfragen minimiert
+
+
+
+
+16.04.11
+- Addonlist Fehler gefixt
+- Fehler in Hilfsausgabe gefixt
+
+
+
+
+# 22.04.2011
+# Version: 0.2.4-Beta2
+- Statuscheck leicht bearbeitet, falls Kein SCREENNAME- gefunden wird.
+- Backupausgabe je nachdem ob der Server online war und gestoppt werden musste.
+- Backups werden nun nach DIR/tmp verschoben.
+- Backupparameter in server.sh von BACKUPPARAM nun zu BACKUP_FILES geaendert.
+- CRON: Funktionsabfrage falls der Cron bereits existiert, ob man ueberschreiben moechte.
+- README: Hinweise zur Konfiguration der Config zugefuegt.
+- Zustimmung bei Listgames und Updates bei Nachfrage des Hldsupdatetools nicht mehr notwendig.
+- Updateausgabe je nachdem ob der Server online war, und gestoppt werden musste.
+- Bei Startfehlern wird nun eine Variable gesetzt und das Starten verhindert.
+- Bei Startfehler erscheint nun die Anzahl der Fehler.
+- Wrapper fuer Verzeichnisabfragen
+- Cleanup Funktion eingebaut.
+
+
+
+
+# 21.06.2011
+# Version: 0.2.5-Beta
+- Die Cleanup Funktion loescht nun auch SourceTv Demos
+- MakeVDF Funktion zugefuegt
+- Parameterzusatz --nocolors zugefuegt [Test]
+- Funktion Watchlog zugefuegt
+- Preconfigurefunktion neu geschrieben.
+  - Variable TEMPLATESURL zugefuegt
+- Maplistcreater neu geschrieben
+  - Test_* Maps werden excludiert
+- Binarycheck zugefuegt
+- Check ob das angegebenes Verzeichnis das ist in welchem das Script ausgefuehrt wurde
+- Startupcheck Struktur
+- Check ob der Server ordnungsgemaess gestartet wurde -- FIXME --
+- Addonsystem umgeschrieben.
+  - Nur noch ein Addon fuer alle Spiele notwendig.
+  - Vdf's werden automatisch erstellt.
+- Shebang aus Config entfernt
+- Updateversion Verbessert
+ - Check Falls Features nicht abrufbar
+ - Check falls Contentserver nicht erreichbar
+ - Check falls Version nicht abrufbar
+ - Check falls neue Config benoetigt wird
+ - Falls neue Config benoetigt wird, wird die Config gebackuppt
+ - Fehleranzeige
+
+ 
+ 
+ 
+# 12.08.2011
+# Version: 0.2.5-Beta2
+- Grosses Update der README
+- Es wurde ein Bug in der addonremove Funktion behoben, wo es passieren kann, dass Leerzeichen in addon.addonlist Probleme waehrend Entfernung verursachen. 
+- Ein Ordnercheck-Bug in Addoninstall wurde gefixt
+- IP-Check ueberarbeitet
+ - Check ob deutsches System
+- Status Anzeige ueberarbeitet
+ - Bug bei unter 10 Spieler behoben
+- Cleanup Funktion ueberarbeitet
+ - Check ob Ordner existieren
+- Backup ueberarbeitet
+  - Backupps werden nun direkt nach tmp/ gebackuppt
+  - Check ob Archiv bereits besteht
+  - Mehrere Formate zur Auswahl (tar|tar.gz|tar.bz2).
+- Script wurde auf Functions umgestellt
+- Parameterzusaetze --nocolors und -c zugefuegt
+- Umstrukturierung der Config
+
+
+
+
+# xx.xx.2011
+# Version: 0.2.x
+- Maplistcreate:
+  - MAPLIST_EXCLUDES zur Config zugefuegt
+  - Maplistexcludes eingebaut
+  - MAPLIST_INCLUDE_ONLY zur Config zugefuegt
+  - Maplistincludes eingebaut
+  
+- Cleanup:
+  - Logs werden nun auf dem ganzen Gameserver gesucht
+  - Backupps werden nun auch geloescht
+  - Zeit zwischen Aktionen verkuertzt
+  - Auflisting uebersichtlicher gestaltet
+  - Check_Before_Shutdown Funktion zugefuegt
+  - Checks ob Ordner vorhanden
+  
+  
+ - Backup:
+  - Check_Before_Shutdown Funktion zugefuegt
+ 
+ - Make:
+  - Make euberprueft nun ob alle Dateien vorhanden sind, und speichert nur diese
+  
+ - Updateversion:
+  - Bug beim updaten der Scriptdatei behoben
+  
+- Main:
+ - RM wird nun geforced
+ - Zusatzparameter -c und -f zugefuegt
+ - Fehler beim loeschen von alten Logs behoben (Screenlog)
+ 
+- Stop:
+  - Check_Before_Shutdown Funktion zugefuegt
+  
+- Update:
+  - Check_Before_Shutdown Funktion zugefuegt
+  
+ - Config:
+  - Variable Check_Before_Shutdown zugefuegt
+  - Variable Cleanup_Ztmp zugefuegt
+  - Variable Cleanup_Logs zugefuegt
+  - Variable Cleanup_Downloads zugefuegt
+  - Variable Cleanup_DownloadLists zugefuegt
+  - Variable Cleanup_SourceTv zugefuegt
+  - Variable Cleanup_Backup zugefuegt
+  - Neue Startparameterfunktion
+    - ./server.sh {-c -f -cf -fc} Funktion
+
+- Extension:
+  - Support fuer eigene Extensions
+  
+Make:
+  - Exitcode angepasst
+
