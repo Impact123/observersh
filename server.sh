@@ -298,11 +298,11 @@ if [ "$CHECK_BEFORE_SHUTDOWN" == "1" ] || [ "$CHECK_BEFORE_SHUTDOWN" == "on" ]; 
       PLAYERS_ONLINE="`$QUAKESTAT -$QSTAT $IP:$PORT |grep -v 'ADDRESS' |awk  '{print $2}' |awk -F '/' {'print $1'}`"
     fi
 	
-	# FALLS SPIELERZAHL UEBER NULL
-	if [ ! "$PLAYERS_ONLINE" == "0" ]; then
+    # FALLS SPIELERZAHL UEBER NULL UND KEIN NO RESPONSE
+    if [ ! "$PLAYERS_ONLINE" == "0" ] && [ ! "$PLAYERS_ONLINE" == "noresponse" ]; then
       clear; echo -e $GELB"Es sind '$PLAYERS_ONLINE' Spieler auf dem Server, Server wird nicht gestoppt."$FARBLOS
 	  exit
-	fi
+    fi
 	
   fi
   
@@ -369,8 +369,8 @@ if [ "$CHECK_BEFORE_SHUTDOWN" == "1" ] || [ "$CHECK_BEFORE_SHUTDOWN" == "on" ]; 
       PLAYERS_ONLINE="`$QUAKESTAT -$QSTAT $IP:$PORT |grep -v 'ADDRESS' |awk  '{print $2}' |awk -F '/' {'print $1'}`"
     fi
 	
-	# FALLS SPIELERZAHL UEBER NULL
-	if [ ! "$PLAYERS_ONLINE" == "0" ]; then
+    # FALLS SPIELERZAHL UEBER NULL UND KEIN NO RESPONSE
+    if [ ! "$PLAYERS_ONLINE" == "0" ] && [ ! "$PLAYERS_ONLINE" == "noresponse" ]; then
       clear; echo -e $GELB"Es sind '$PLAYERS_ONLINE' Spieler auf dem Server, Update wird nicht fortgesetzt."$FARBLOS
 	  exit
 	fi
@@ -653,8 +653,8 @@ if [ "$CHECK_BEFORE_SHUTDOWN" == "1" ] || [ "$CHECK_BEFORE_SHUTDOWN" == "on" ]; 
       PLAYERS_ONLINE="`$QUAKESTAT -$QSTAT $IP:$PORT |grep -v 'ADDRESS' |awk  '{print $2}' |awk -F '/' {'print $1'}`"
     fi
 	
-	# FALLS SPIELERZAHL UEBER NULL
-	if [ ! "$PLAYERS_ONLINE" == "0" ]; then
+    # FALLS SPIELERZAHL UEBER NULL UND KEIN NO RESPONSE
+    if [ ! "$PLAYERS_ONLINE" == "0" ] && [ ! "$PLAYERS_ONLINE" == "noresponse" ]; then
       clear; echo -e $GELB"Es sind '$PLAYERS_ONLINE' Spieler auf dem Server, Backup wird nicht fortgesetzt."$FARBLOS
 	  exit
 	fi
