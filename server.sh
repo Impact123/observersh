@@ -58,7 +58,7 @@ fi
 
 # ADMINCHECK
 if [ "`whoami`" == "root" ]; then
-  echo "Verantwortungsvolle Admins starten Gameserver nicht mit dem root User."
+  echo -e $ROT"Error:$FARBLOS Verantwortungsvolle Admins starten Gameserver nicht mit dem root User."
   # STARTUP_LOCK SETZEN
   STARTUP_LOCK="$[$STARTUP_LOCK+1]"
   echo ""
