@@ -1088,9 +1088,28 @@ fi
 echo -e $GELB"Folgende Addons sind installiert"$FARBLOS
 echo ""
 echo "---"
-echo "`cat $DIR/addonslist.tmp`"
+echo "`cat $DIR/addonslist.tmp | tr -t [a-z] [A-Z]`"
 echo "---"
 rm -f $DIR/addonslist.tmp
+}
+# ---------------------------------------------------------------------------------------------
+
+
+
+# ADDONVERSION
+# ---------------------------------------------------------------------------------------------
+function SERVER_SH_ADDONVERSION {
+# FIXME
+for addon in $(ls $DIR/$SRCDSDIR/$GAMEMOD/*.version); do
+  if [ -f "$addon" ]; then
+    echo "${addon%????????}" | awk -F "$DIR/$SRCDSDIR/$GAMEMOD/" '{print $2}' | tr -t [a-z] [A-Z]
+	echo "-----------"
+    cat "$addon"
+    echo -e "\n-----------\n"
+  else
+    echo "Addoninformationen fuer $addon nicht verfuegbar"
+  fi
+done
 }
 # ---------------------------------------------------------------------------------------------
 
@@ -1535,6 +1554,10 @@ addonlist|17)
 SERVER_SH_ADDONLIST
 ;;
 
+addonversion)
+SERVER_SH_ADDONVERSION
+;;
+
 addons|addonlist_local|18)
 SERVER_SH_ADDONS
 ;;
@@ -1555,7 +1578,7 @@ watchlog|logwatch|log)
 SERVER_SH_WATCHLOG
 ;;
 
-h|help|-h|--help|22)
+h|help|22)
 SERVER_SH_HELP
 ;;
 
