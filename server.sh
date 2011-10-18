@@ -1115,6 +1115,51 @@ done
 
 
 
+# ADDONBACKUP
+# ---------------------------------------------------------------------------------------------
+function SERVER_SH_ADDONBACKUP {
+
+# FALSCHEINGABE
+if [ "$1" == "" ]; then
+  echo -e $ROT"Error:$FARBLOS Falscheingabe"
+  echo "     Usage: addonbackup Addonname"
+  exit
+fi
+
+# ORDNERCHECK
+if [ ! -d "$DIR/$SRCDSDIR/$GAMEMOD" ]; then
+  echo "$DIR/$SRCDSDIR/$GAMEMOD existiert nicht."
+  exit
+else
+  cd $DIR/$SRCDSDIR/$GAMEMOD
+fi
+
+# PRUFEN UND DEINSTALLIEREN DES ADDONS 
+if [ ! -f "$DIR/$SRCDSDIR/$GAMEMOD/$1.addonlist" ]; then
+  echo -e $GELB"Die Addondatei '$1.addonlist' existiert nicht!"$FARBLOS
+  exit
+fi
+
+# CHECK OB ARCHIV BEREITS BESTEHT
+if [ -f "$DIR/tmp/$1-`$DATE`.tar.gz" ]; then
+  echo -e $GELB"Ein Backuparchiv mit diesem Datum existiert bereits, bitte warten sie einen Augenblick"$FARBLOS
+  exit
+fi
+
+echo -e $GELB"Einen Moment bitte."$FARBLOS
+sleep 1
+
+# PACKEN
+tar cfz $DIR/tmp/addon_$1-`$DATE`.tar.gz -T $1.addonlist $1.addonlist
+
+
+# ---
+clear; echo -e $GELB"Addon '$1' wurde gebackuppt"$FARBLOS
+}
+# ---------------------------------------------------------------------------------------------
+
+
+
 # CLEANUP
 # ---------------------------------------------------------------------------------------------
 function SERVER_SH_CLEANUP {
@@ -1554,12 +1599,16 @@ addonlist|17)
 SERVER_SH_ADDONLIST
 ;;
 
+addons|addonlist_local|18)
+SERVER_SH_ADDONS
+;;
+
 addonversion)
 SERVER_SH_ADDONVERSION
 ;;
 
-addons|addonlist_local|18)
-SERVER_SH_ADDONS
+addonbackup)
+SERVER_SH_ADDONBACKUP $2
 ;;
 
 cleanup|19)
