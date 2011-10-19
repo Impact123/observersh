@@ -1100,16 +1100,20 @@ rm -f $DIR/addonslist.tmp
 # ---------------------------------------------------------------------------------------------
 function SERVER_SH_ADDONVERSION {
 # FIXME
-for addon in $(ls $DIR/$SRCDSDIR/$GAMEMOD/*.version); do
-  if [ -f "$addon" ]; then
-    echo "${addon%????????}" | awk -F "$DIR/$SRCDSDIR/$GAMEMOD/" '{print $2}' | tr -t [a-z] [A-Z]
-	echo "-----------"
-    cat "$addon"
-    echo -e "\n-----------\n"
-  else
-    echo "Addoninformationen fuer $addon nicht verfuegbar"
-  fi
-done
+if [ -f "$DIR/$SRCDSDIR/$GAMEMOD/*.version" ]; then
+  for addon in $(ls $DIR/$SRCDSDIR/$GAMEMOD/*.version); do
+    if [ -f "$addon" ]; then
+      echo "${addon%????????}" | awk -F "$DIR/$SRCDSDIR/$GAMEMOD/" '{print $2}' | tr -t [a-z] [A-Z]
+	  echo "-----------"
+      cat "$addon"
+      echo -e "\n-----------\n"
+    else
+      echo "Addoninformationen fuer $addon nicht verfuegbar"
+    fi
+  done
+else
+  echo "Keine Addons installiert."
+fi
 }
 # ---------------------------------------------------------------------------------------------
 
