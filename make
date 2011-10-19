@@ -4,6 +4,7 @@ clear
 
 FILES="server.sh server.conf version.txt make docs/CHANGELOG docs/LICENSE docs/README"
 
+LOCK="0"
 for i in $FILES; do
   if ! [ -f "$i" ]; then
     echo "Error: Missing '$i'"
@@ -19,3 +20,5 @@ chmod 600 server.conf version.txt docs/CHANGELOG docs/LICENSE docs/README
 chmod 700 server.sh make
 tar cfz $RELEASE $FILES
 clear; echo "Release $RELEASE gepackt."
+
+md5sum $RELEASE | awk {'print $1'} > server.md5sum
