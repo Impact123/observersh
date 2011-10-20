@@ -8,7 +8,7 @@ LOCK="0"
 for i in $FILES; do
   if ! [ -f "$i" ]; then
     echo "Error: Missing '$i'"
-	LOCK="1"
+    LOCK="1"
   fi
 done
 

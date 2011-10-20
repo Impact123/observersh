@@ -1027,7 +1027,7 @@ sleep 1
 
 # LOESCHFUNKTION
 cat $DIR/$SRCDSDIR/$GAMEMOD/$1.addonlist | tr -d '\r' | tr -s '\n' | while read ADDONLIST; do
-  rm -Rf $ADDONLIST
+  rm -Rf "$ADDONLIST"
 done
 
 rm -f $DIR/$SRCDSDIR/$GAMEMOD/$1.addonlist
@@ -1100,7 +1100,7 @@ rm -f $DIR/addonslist.tmp
 # ---------------------------------------------------------------------------------------------
 function SERVER_SH_ADDONVERSION {
 # FIXME
-if [ -f "$DIR/$SRCDSDIR/$GAMEMOD/*.version" ]; then
+if [[ `ls $DIR/$SRCDSDIR/$GAMEMOD/*.version` ]]; then
   for addon in $(ls $DIR/$SRCDSDIR/$GAMEMOD/*.version); do
     if [ -f "$addon" ]; then
       echo "${addon%????????}" | awk -F "$DIR/$SRCDSDIR/$GAMEMOD/" '{print $2}' | tr -t [a-z] [A-Z]
