@@ -266,6 +266,7 @@ for EXTENSION in $(find $DIR/extensions/ -type f -name "*_extension.sh" |awk -F 
 # FALLS AUSFUEHRBAR
   if [ ! -x "$DIR/extensions/$EXTENSION" ]; then
     chmod 700 $DIR/extensions/$EXTENSION
+	$DIR/extensions/$EXTENSION start
   else
     $DIR/extensions/$EXTENSION start
   fi
@@ -325,6 +326,7 @@ for EXTENSION in $(find $DIR/extensions/ -type f -name "*_extension.sh" |awk -F 
 # FALLS AUSFUEHRBAR
   if [ ! -x "$DIR/extensions/$EXTENSION" ]; then
     chmod 700 $DIR/extensions/$EXTENSION
+	$DIR/extensions/$EXTENSION stop
   else
     $DIR/extensions/$EXTENSION stop
   fi
@@ -482,6 +484,7 @@ for EXTENSION in $(find $DIR/extensions/ -type f -name "*_extension.sh" |awk -F 
 # FALLS AUSFUEHRBAR
   if [ ! -x "$DIR/extensions/$EXTENSION" ]; then
     chmod 700 $DIR/extensions/$EXTENSION
+	$DIR/extensions/$EXTENSION status
   else
     $DIR/extensions/$EXTENSION status
   fi
