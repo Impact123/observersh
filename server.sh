@@ -577,10 +577,10 @@ if [ ! -d "$DIR/$SRCDSDIR/$GAMEMOD/maps" ]; then
 fi
 
 cd $DIR/$SRCDSDIR/$GAMEMOD/maps
-echo "// Maplist.txt created by GuGy.eu Server.sh $VERSION" > $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
-echo "// Mapcycle.txt created by GuGy.eu Server.sh $VERSION" > $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
-echo "" >> $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
-echo "" >> $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
+# echo "// Maplist.txt created by GuGy.eu Server.sh $VERSION" > $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
+# echo "// Mapcycle.txt created by GuGy.eu Server.sh $VERSION" > $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
+# echo "" >> $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
+# echo "" >> $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
 
 # FALLS MAPLIST_INCLUDE_ONLY LEER ODER DISABLED
 if [ -z "$MAPLIST_INCLUDE_ONLY" ] || [ "$MAPLIST_INCLUDE_ONLY" == "0" ] || [ "$MAPLIST_INCLUDE_ONLY" == "disabled" ]; then
