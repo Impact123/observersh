@@ -4,12 +4,12 @@
 # Ueber Das Script
 # ---------------------------------------------------------------------------------------------
 # Name:    - Gameserververwaltungsscript fuer Orangebox-Games 
-# Version: - 0.2.5-Beta2
+# Version: - 0.2.5-Beta3
 # Author:  - Impact, http://gugy.eu
 # Lizens:  - GPLv3
 # E-Mail:  - support@gugy.eu
 # Web:     - http://gugyclan.eu
-# Datum:   - 12.08.2011
+# Datum:   - 17.09.2012
 #
 #
 #
