@@ -1,2 +1,3 @@
 # Version Script
 Version: 0.2.5-Beta3
+LOCK=1
