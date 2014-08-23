@@ -403,25 +403,49 @@ if [[ `screen -ls |grep $SCREENNAME-backup` ]]; then
   exit
 fi
 
-# CHECKEN OB HLDSUPDATETOOL VORHANDEN
-if [ ! -f "steam" ]; then
-  echo "Das HLdsupdatetool bzw Steam ist nicht vorhanden und wird nun herruntergeladen."
-  sleep 2
- 
-# HLDSUPDATETOOLBEORGUNG
-  wget -q http://www.steampowered.com/download/hldsupdatetool.bin
-  chmod 755 hldsupdatetool.bin
-  echo "yes" | ./hldsupdatetool.bin
-  ./steam -command update
-  clear
-fi
+# SteamCMD
+if [ $STEAMCMD == "0" ] || [ $STEAMCMD == "no" ]; then
+	# HLDSUpdateTool
+	if [ ! -f "steam" ]; then
+	  echo "Das HLdsupdatetool bzw Steam ist nicht vorhanden und wird nun herruntergeladen."
+	  sleep 2
+	 
+	# HLDSUPDATETOOLBEORGUNG
+	  wget -q http://www.steampowered.com/download/hldsupdatetool.bin
+	  chmod 755 hldsupdatetool.bin
+	  echo "yes" | ./hldsupdatetool.bin
+	  ./steam -command update
+	  clear
+	fi
 
 
-screen -dmS $SCREENNAME-update ./steam -command update -game "$UPDATEMOD" -dir . -verify_all -retry 
-if [ "$UPDATE_SERVER_STAT" == "ON" ]; then
-  clear; echo -e $GELB"Der Server $SCREENNAME wurde gestoppt, und das Update wurde im Screen $SCREENNAME-update gestartet."$FARBLOS
+	screen -dmS $SCREENNAME-update ./steam -command update -game "$UPDATEMOD" -dir . -verify_all -retry 
+	if [ "$UPDATE_SERVER_STAT" == "ON" ]; then
+	  clear; echo -e $GELB"Der Server $SCREENNAME wurde gestoppt, und das Update wurde im Screen $SCREENNAME-update gestartet."$FARBLOS
+	else
+	  clear; echo -e $GELB"Das Update wurde im Screen $SCREENNAME-update gestartet."$FARBLOS
+	fi
 else
-  clear; echo -e $GELB"Das Update wurde im Screen $SCREENNAME-update gestartet."$FARBLOS
+	# SteamCMD
+	if [ ! -f "steamcmd.sh" ]; then
+		echo "SteamCMD ist nicht vorhanden und wird nun herruntergeladen."
+		sleep 2
+		
+		# SteamCMD Download
+		wget -q http://media.steampowered.com/installer/steamcmd_linux.tar.gz
+		tar xf steamcmd_linux.tar.gz
+		rm -f steamcmd_linux.tar.gz
+		./steamcmd.sh <<< "exit"
+		clear
+	fi
+	
+
+	screen -dmS $SCREENNAME-update ./steamcmd.sh +login anonymous +force_install_dir $DIR/$GAMEMOD +app_update $APPID validate +quit
+	if [ "$UPDATE_SERVER_STAT" == "ON" ]; then
+	  clear; echo -e $GELB"Der Server $SCREENNAME wurde gestoppt, und das Update wurde im Screen $SCREENNAME-update gestartet."$FARBLOS
+	else
+	  clear; echo -e $GELB"Das Update wurde im Screen $SCREENNAME-update gestartet."$FARBLOS
+	fi
 fi
 
 # PRECONFIGURE_IN
