@@ -440,7 +440,7 @@ else
 	fi
 	
 
-	screen -dmS $SCREENNAME-update ./steamcmd.sh +login anonymous +force_install_dir $DIR/$GAMEMOD +app_update $APPID validate +quit
+	screen -dmS $SCREENNAME-update ./steamcmd.sh +login $STEAMCMD_LOGIN $STEAMCMD_PASSWORD +force_install_dir $DIR/$GAMEMOD +app_update $APPID validate +quit
 	if [ "$UPDATE_SERVER_STAT" == "ON" ]; then
 		clear; echo -e $GELB"Der Server $SCREENNAME wurde gestoppt, und das Update wurde im Screen $SCREENNAME-update gestartet."$FARBLOS
 	else
