@@ -600,6 +600,11 @@ if [ ! -d "$DIR/$SRCDSDIR/$GAMEMOD/maps" ]; then
 	exit
 fi
 
+# FALLS WORKSHOP ORDER EXISTIERT
+if [[ -d "$DIR/$SRCDSDIR/$GAMEMOD/maps/workshop" ]]; then
+	WORKSHOP_FOLDER_EXIST="1"
+fi
+
 cd $DIR/$SRCDSDIR/$GAMEMOD/maps
 # echo "// Maplist.txt created by GuGy.eu Server.sh $VERSION" > $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
 # echo "// Mapcycle.txt created by GuGy.eu Server.sh $VERSION" > $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
@@ -609,24 +614,33 @@ cd $DIR/$SRCDSDIR/$GAMEMOD/maps
 # FALLS MAPLIST_INCLUDE_ONLY LEER ODER DISABLED
 if [ -z "$MAPLIST_INCLUDE_ONLY" ] || [ "$MAPLIST_INCLUDE_ONLY" == "0" ] || [ "$MAPLIST_INCLUDE_ONLY" == "disabled" ]; then
 # FALLS MAPLIST_EXCLUDES NICHT LEER
-if ! [ -z "$MAPLIST_EXCLUDES" ] || [ "$MAPLIST_EXCLUDES" == "0" ] || [ "$MAPLIST_EXCLUDES" == "disabled" ]; then
-	ls *.bsp |awk -F '.' '{print $1}' |sort |grep -Evi "$MAPLIST_EXCLUDES" >> $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
-	ls *.bsp |awk -F '.' '{print $1}' |sort |grep -Evi "$MAPLIST_EXCLUDES" >> $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
-else
-	ls *.bsp |awk -F '.' '{print $1}' |sort >> $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
-	ls *.bsp |awk -F '.' '{print $1}' |sort >> $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
-fi
+	if ! [ -z "$MAPLIST_EXCLUDES" ] || [ "$MAPLIST_EXCLUDES" == "0" ] || [ "$MAPLIST_EXCLUDES" == "disabled" ]; then
+		ls *.bsp |awk -F '.' '{print $1}' |sort |grep -Evi "$MAPLIST_EXCLUDES" | tee -a $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
+		
+		if [ "$WORKSHOP_FOLDER_EXIST" == "1" ]; then
+			find workshop/ -name "*.bsp" | sed "s/\.bsp//g" | tee -a >> $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
+		fi
+	else
+		ls *.bsp |awk -F '.' '{print $1}' |sort | tee -a $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
+		
+		if [ "$WORKSHOP_FOLDER_EXIST" == "1" ]; then
+			find workshop/ -name "*.bsp" | sed "s/\.bsp//g" | tee -a >> $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
+		fi
+	fi
 # MAPLIST_INCLUDE_ONLY ELSE
 else
-	ls *.bsp |awk -F '.' '{print $1}' |sort |grep -Ei "$MAPLIST_INCLUDE_ONLY" >> $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt
-	ls *.bsp |awk -F '.' '{print $1}' |sort |grep -Ei "$MAPLIST_INCLUDE_ONLY" >> $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
+	ls *.bsp |awk -F '.' '{print $1}' |sort |grep -Ei "$MAPLIST_INCLUDE_ONLY" | tee -a $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
+	
+	if [ "$WORKSHOP_FOLDER_EXIST" == "1" ]; then
+		find workshop/ -name "*.bsp" | sed "s/\.bsp//g" | tee -a >> $DIR/$SRCDSDIR/$GAMEMOD/maplist.txt $DIR/$SRCDSDIR/$GAMEMOD/mapcycle.txt
+	fi
 fi
 
-		if [ "$MAPLIST_CFG_EXIST" == "1" ]; then
-			echo -e $GELB"Mapliste und Mapcycle wurden erstellt, und die alten nach Datum gebackuppt."$FARBLOS
-	else
-		echo -e $GELB"Mapliste und Mapcycle wurden erstellt."$FARBLOS
-	fi
+if [ "$MAPLIST_CFG_EXIST" == "1" ]; then
+		echo -e $GELB"Mapliste und Mapcycle wurden erstellt, und die alten nach Datum gebackuppt."$FARBLOS
+else
+	echo -e $GELB"Mapliste und Mapcycle wurden erstellt."$FARBLOS
+fi
 }
 # ---------------------------------------------------------------------------------------------
 
